@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { hideAlert } from '../../redux/slices/alertSlice';
 import { FiX, FiCheckCircle, FiAlertTriangle, FiInfo } from 'react-icons/fi';
+import { selectAlerts } from '../../redux/selectors/alertSelectors';
 
 const AlertContainer = styled.div`
   position: fixed;
@@ -18,10 +19,10 @@ const AlertItem = styled.div`
   border-radius: ${({ theme }) => theme.shape.borderRadius}px;
   display: flex;
   align-items: center;
-  background: ${({ theme, variant }) => 
-    variant === 'success' ? theme.palette.success.main :
-    variant === 'error' ? theme.palette.error.main :
-    variant === 'warning' ? theme.palette.warning.main :
+  background: ${({ theme, $variant }) => 
+    $variant === 'success' ? theme.palette.success.main :
+    $variant === 'error' ? theme.palette.error.main :
+    $variant === 'warning' ? theme.palette.warning.main :
     theme.palette.info.main};
   color: white;
   box-shadow: ${({ theme }) => theme.shadows[3]};
@@ -42,7 +43,7 @@ const CloseButton = styled.button`
 
 const Alert = () => {
   const dispatch = useDispatch();
-  const { alerts } = useSelector((state) => state.alert);
+  const alerts = useSelector(selectAlerts); // ✅ memoized selector
 
   const getIcon = (type) => {
     switch (type) {
@@ -52,10 +53,12 @@ const Alert = () => {
     }
   };
 
+  if (!alerts?.length) return null;
+
   return (
     <AlertContainer>
       {alerts.map((alert) => (
-        <AlertItem key={alert.id} variant={alert.type}>
+        <AlertItem key={alert.id} $variant={alert.type}>
           {getIcon(alert.type)}
           <AlertMessage>{alert.message}</AlertMessage>
           <CloseButton onClick={() => dispatch(hideAlert(alert.id))}>

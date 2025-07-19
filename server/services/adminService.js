@@ -4,7 +4,7 @@ const Personnel = require('../models/Personnel');
 const Branch = require('../models/Branch');
 const Transfer = require('../models/Transfer');
 const logger = require('../utils/logger');
-const { generateReport } = require('../utils/reportGenerator');
+const { generateReport: generateReportFile } = require('../utils/reportGenerator');
 
 const getDashboardStats = async () => {
   try {
@@ -80,7 +80,6 @@ const getUserById = async (id) => {
 };
 
 const createUser = async (userData) => {
-  // Check if user already exists
   const existingUser = await User.findOne({
     $or: [
       { idNumber: userData.idNumber },
@@ -92,7 +91,6 @@ const createUser = async (userData) => {
     throw new Error('User already exists with this ID or email');
   }
 
-  // Create new user
   const user = new User(userData);
   await user.save();
 
@@ -100,7 +98,6 @@ const createUser = async (userData) => {
 };
 
 const updateUser = async (id, userData) => {
-  // Don't allow updating password here
   if (userData.password) {
     delete userData.password;
   }
@@ -120,10 +117,10 @@ const deleteUser = async (id) => {
   ).select('-password');
 };
 
-const generateReport = async (type = 'summary') => {
+const handleReportGeneration = async (type = 'summary') => {
   try {
     let data;
-    
+
     switch (type) {
       case 'personnel':
         data = await Personnel.find({ isActive: true })
@@ -143,7 +140,7 @@ const generateReport = async (type = 'summary') => {
         data = await getDashboardStats();
     }
 
-    return await generateReport(type, data);
+    return await generateReportFile(type, data);
   } catch (err) {
     logger.error(`Error generating report: ${err.message}`);
     throw err;
@@ -157,5 +154,5 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
-  generateReport
+  generateReport: handleReportGeneration
 };

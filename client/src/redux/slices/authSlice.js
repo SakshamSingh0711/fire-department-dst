@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../api/authAPI';
 
+// Async thunks
 export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
@@ -37,6 +38,19 @@ export const loadUser = createAsyncThunk(
   }
 );
 
+export const updateProfile = createAsyncThunk(
+  'auth/updateProfile',
+  async (updatedData, { rejectWithValue }) => {
+    try {
+      const response = await api.updateProfile(updatedData);
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || { message: 'Update failed' });
+    }
+  }
+);
+
+// Slice
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
@@ -54,6 +68,11 @@ const authSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null;
+    },
+    setCredentials: (state, action) => {
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+      localStorage.setItem('token', action.payload.token);
     }
   },
   extraReducers: (builder) => {
@@ -71,6 +90,7 @@ const authSlice = createSlice({
         state.error = action.payload?.message || 'Login failed';
         state.isLoading = false;
       })
+
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
       })
@@ -84,6 +104,7 @@ const authSlice = createSlice({
         state.error = action.payload?.message || 'Registration failed';
         state.isLoading = false;
       })
+
       .addCase(loadUser.pending, (state) => {
         state.isLoading = true;
       })
@@ -96,9 +117,22 @@ const authSlice = createSlice({
         state.user = null;
         state.token = null;
         state.isLoading = false;
+      })
+
+      .addCase(updateProfile.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.isLoading = false;
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.error = action.payload?.message || 'Profile update failed';
+        state.isLoading = false;
       });
   }
 });
 
-export const { logout, clearError } = authSlice.actions;
+export const { logout, clearError, setCredentials } = authSlice.actions;
 export default authSlice.reducer;
+// export { updateProfile };

@@ -15,3 +15,4 @@ export const useMediaQuery = (query) => {
 
   return matches;
 };
+export default useMediaQuery;

@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import styled from 'styled-components';
-import { pulse } from '../../styles/animations';
+import { pulse , shake } from '../../styles/animations';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 import Loading from '../common/Loading';

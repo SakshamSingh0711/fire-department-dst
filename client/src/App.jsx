@@ -59,10 +59,10 @@ const App = () => {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <ThemeProvider theme={darkTheme}>
-          <GlobalStyles />
-          <AuthContextProvider>
-            <Router>
+        <Router>
+          <ThemeProvider theme={darkTheme}>
+            <GlobalStyles />
+            <AuthContextProvider>
               <AppContainer>
                 <Navbar toggleSidebar={toggleSidebar} />
                 <MainContent>
@@ -119,15 +119,25 @@ const App = () => {
                 </MainContent>
                 <Footer />
               </AppContainer>
-            </Router>
-          </AuthContextProvider>
-        </ThemeProvider>
+            </AuthContextProvider>
+          </ThemeProvider>
+        </Router>
       </PersistGate>
     </Provider>
   );
 };
 
 export default App;
+
+// function App() {
+//   return (
+//     <div style={{ padding: '2rem', fontSize: '24px' }}>
+//       ✅ React is working!
+//     </div>
+//   );
+// }
+
+// export default App;
 
 
 
