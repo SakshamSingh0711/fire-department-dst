@@ -48,7 +48,7 @@ const Personnel = () => {
     const fetchPersonnel = async () => {
       try {
         setIsLoading(true);
-        const response = await api.getPersonnel();
+        const response = await api.getAllPersonnel();
         setPersonnel(response.data);
       } catch (error) {
         console.error('Error fetching personnel:', error);

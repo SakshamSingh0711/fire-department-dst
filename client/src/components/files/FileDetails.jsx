@@ -32,8 +32,9 @@ const InfoItem = styled.div`
   align-items: center;
   gap: 0.5rem;
 
-  span {
+  div > div {
     font-weight: 500;
+    margin-bottom: 0.2rem;
   }
 `;
 
@@ -51,19 +52,26 @@ const Actions = styled.div`
 `;
 
 const FileDetails = ({ file, onClose, onUpdate }) => {
+  if (!file) return null;
+
   const handleStatusChange = (newStatus) => {
-    onUpdate({ ...file, status: newStatus });
+    onUpdate?.({ ...file, status: newStatus });
   };
 
   return (
     <FileDetailsContainer>
       <FileHeader>
-        <h2>{file.fileNo}</h2>
-        <Badge variant={
-          file.status === 'Completed' ? 'success' :
-          file.urgency === 'High' ? 'error' : 'warning'
-        }>
-          {file.status}
+        <h2>{file.fileNo || 'Untitled File'}</h2>
+        <Badge
+          variant={
+            file.status === 'Completed'
+              ? 'success'
+              : file.urgency === 'High'
+              ? 'error'
+              : 'warning'
+          }
+        >
+          {file.status || 'Unknown'}
         </Badge>
       </FileHeader>
 
@@ -72,16 +80,22 @@ const FileDetails = ({ file, onClose, onUpdate }) => {
           <FiFileText />
           <div>
             <div>Subject</div>
-            <span>{file.subject}</span>
+            <span>{file.subject || 'N/A'}</span>
           </div>
         </InfoItem>
+
         <InfoItem>
           <FiClock />
           <div>
             <div>Created</div>
-            <span>{new Date(file.createdAt).toLocaleDateString()}</span>
+            <span>
+              {file.createdAt
+                ? new Date(file.createdAt).toLocaleDateString()
+                : 'N/A'}
+            </span>
           </div>
         </InfoItem>
+
         <InfoItem>
           <FiUser />
           <div>
@@ -89,6 +103,7 @@ const FileDetails = ({ file, onClose, onUpdate }) => {
             <span>{file.createdBy?.name || 'N/A'}</span>
           </div>
         </InfoItem>
+
         <InfoItem>
           <FiArrowRight />
           <div>
@@ -100,11 +115,13 @@ const FileDetails = ({ file, onClose, onUpdate }) => {
 
       <FileContent>
         <h3>Details</h3>
-        <p>{file.details}</p>
+        <p>{file.details || 'No details provided.'}</p>
       </FileContent>
 
       <Actions>
-        <Button variant="outlined" onClick={onClose}>Close</Button>
+        <Button variant="outlined" onClick={onClose}>
+          Close
+        </Button>
         {file.status !== 'Completed' && (
           <Button onClick={() => handleStatusChange('Completed')}>
             Mark Complete

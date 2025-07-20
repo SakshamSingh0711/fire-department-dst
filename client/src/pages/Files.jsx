@@ -67,7 +67,6 @@ const Files = () => {
   }, []);
 
   useEffect(() => {
-    // Check if URL has a file ID to show details
     const params = new URLSearchParams(location.search);
     const fileId = params.get('id');
     if (fileId) {
@@ -80,7 +79,7 @@ const Files = () => {
   }, [location.search, files]);
 
   const handleSearch = (filters) => {
-    let result = [...files];
+    let result = Array.isArray(files) ? [...files] : [];
 
     if (filters.status) {
       result = result.filter((file) => file.status === filters.status);
@@ -110,8 +109,8 @@ const Files = () => {
   const handleCreateFile = async (fileData) => {
     try {
       const response = await api.createFile(fileData);
-      setFiles([...files, response.data]);
-      setFilteredFiles([...filteredFiles, response.data]);
+      setFiles((prev) => [...prev, response.data]);
+      setFilteredFiles((prev) => [...prev, response.data]);
       setShowCreateModal(false);
     } catch (error) {
       console.error('Error creating file:', error);

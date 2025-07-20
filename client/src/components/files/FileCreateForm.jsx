@@ -47,7 +47,7 @@ const validationSchema = Yup.object().shape({
 });
 
 const FileCreateForm = ({ onSubmit, onCancel }) => {
-  const { branches } = useSelector((state) => state.branches);
+  const { branches = [] } = useSelector((state) => state.branches);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const formik = useFormik({

@@ -8,44 +8,57 @@ const seedDatabase = async () => {
   try {
     await mongoose.connect(config.mongoUri, {
       useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-      useFindAndModify: false
+      useUnifiedTopology: true
     });
 
-    logger.info('Connected to MongoDB for seeding');
+    logger.info('✅ Connected to MongoDB for seeding');
 
     // Clear existing data
     await User.deleteMany({});
     await Branch.deleteMany({});
+    logger.info('🗑️ Cleared existing User and Branch data');
 
     // Create default branches
-    const branches = await Branch.insertMany(
-      config.defaultBranches.map((name, index) => ({
-        name,
-        code: `BR-${index + 1}`,
-        phone: `+123456789${index}`,
-        email: `${name.toLowerCase().replace(/\s+/g, '-')}@firedept.gov`,
-        isActive: true
-      }))
-    );
+    let branches = [];
+    try {
+      branches = await Branch.insertMany(
+        config.defaultBranches.map((name, index) => ({
+          name,
+          code: `BR-${index + 1}`,
+          phone: `+123456789${index}`,
+          email: `${name.toLowerCase().replace(/\s+/g, '-') || 'branch'}@firedept.gov`,
+          isActive: true
+        })),
+        { ordered: true } // stop if there's a duplicate (safer for seeding)
+      );
+      logger.info(`✅ Inserted ${branches.length} branches`);
+    } catch (branchErr) {
+      logger.error(`❌ Failed to insert branches: ${branchErr.message}`);
+      return process.exit(1);
+    }
 
     // Create admin user
-    const adminUser = new User({
-      idNumber: 'ADMIN001',
-      name: 'Admin User',
-      email: 'admin@firedept.gov',
-      password: 'admin123',
-      role: 'Master',
-      branch: branches[0]._id
-    });
+    try {
+      const adminUser = new User({
+        idNumber: 'ADMIN001',
+        name: 'Admin User',
+        email: 'admin@firedept.gov',
+        password: 'admin123',
+        role: 'Master',
+        branch: branches[0]._id
+      });
 
-    await adminUser.save();
+      await adminUser.save();
+      logger.info('✅ Admin user created successfully');
+    } catch (userErr) {
+      logger.error(`❌ Failed to create admin user: ${userErr.message}`);
+      return process.exit(1);
+    }
 
-    logger.info('Database seeded successfully');
+    logger.info('🎉 Database seeded successfully');
     process.exit(0);
   } catch (err) {
-    logger.error(`Database seeding error: ${err.message}`);
+    logger.error(`❌ Database seeding failed: ${err.message}`);
     process.exit(1);
   }
 };

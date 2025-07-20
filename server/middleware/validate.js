@@ -14,9 +14,10 @@ const validate = validations => {
 };
 
 const loginValidation = [
-  check('id', 'ID is required').notEmpty(),
+  check('idNumber', 'ID Number is required').notEmpty(),
   check('password', 'Password is required').notEmpty()
 ];
+
 
 const registerValidation = [
   check('idNumber', 'ID Number is required').notEmpty(),

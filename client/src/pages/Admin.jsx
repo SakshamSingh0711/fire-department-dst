@@ -21,6 +21,11 @@ const AdminHeader = styled.div`
     font-size: 1.8rem;
     color: ${({ theme }) => theme.palette.primary.main};
   }
+
+  p {
+    color: ${({ theme }) => theme.palette.text.secondary};
+    margin-top: 0.5rem;
+  }
 `;
 
 const AdminContent = styled.div`
@@ -35,33 +40,40 @@ const Admin = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Role guard
   useEffect(() => {
-    if (user?.role !== 'Master') {
+    if (!user || user.role !== 'Master') {
       navigate('/');
-      return;
     }
+  }, [user, navigate]);
 
+  // Fetch dashboard stats
+  useEffect(() => {
     const fetchStats = async () => {
       try {
         setIsLoading(true);
-        const response = await api.getStats();
-        setStats(response.data);
-      } catch (error) {
-        console.error('Error fetching admin stats:', error);
+        const res = await api.getDashboardStats();
+        setStats(res);
+      } catch (err) {
+        console.error('Error fetching admin stats:', err);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchStats();
-  }, [user, navigate]);
+    if (user?.role === 'Master') {
+      fetchStats();
+    }
+  }, [user]);
 
+  // Sync tab from URL
   useEffect(() => {
-    // Check URL for tab
     const params = new URLSearchParams(location.search);
     const tab = params.get('tab');
     if (tab && ['dashboard', 'users', 'reports'].includes(tab)) {
       setActiveTab(tab);
+    } else {
+      setActiveTab('dashboard');
     }
   }, [location.search]);
 
@@ -91,9 +103,7 @@ const Admin = () => {
         {activeTab === 'dashboard' && (
           <Dashboard stats={stats} loading={isLoading} />
         )}
-
         {activeTab === 'users' && <UserManagement />}
-
         {activeTab === 'reports' && <Reports />}
       </AdminContent>
     </AdminContainer>

@@ -33,40 +33,37 @@ const FilterSection = styled.div`
   margin-top: 1rem;
 `;
 
-const FileSearch = ({ branches, onSearch }) => {
+const FileSearch = ({ branches = [], onSearch }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     status: '',
     urgency: '',
-    branch: ''
+    branch: '',
   });
   const [showFilters, setShowFilters] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSearch({
-      searchTerm,
-      ...filters
+      searchTerm: searchTerm.trim(),
+      ...filters,
     });
   };
 
   const handleFilterChange = (name, value) => {
-    setFilters({
-      ...filters,
-      [name]: value
-    });
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   return (
     <SearchContainer>
       <SearchHeader>
         <h3>Search Files</h3>
-        <Button
-          variant="text"
-          size="small"
-          onClick={() => setShowFilters(!showFilters)}
-        >
-          <FiFilter /> {showFilters ? 'Hide Filters' : 'Show Filters'}
+        <Button variant="text" size="small" onClick={() => setShowFilters(!showFilters)}>
+          <FiFilter />
+          {showFilters ? ' Hide Filters' : ' Show Filters'}
         </Button>
       </SearchHeader>
 
@@ -90,7 +87,7 @@ const FileSearch = ({ branches, onSearch }) => {
               { value: '', label: 'All Statuses' },
               { value: 'Pending', label: 'Pending' },
               { value: 'Under Review', label: 'Under Review' },
-              { value: 'Completed', label: 'Completed' }
+              { value: 'Completed', label: 'Completed' },
             ]}
           />
           <Select
@@ -101,7 +98,7 @@ const FileSearch = ({ branches, onSearch }) => {
               { value: '', label: 'All Urgency Levels' },
               { value: 'Low', label: 'Low' },
               { value: 'Medium', label: 'Medium' },
-              { value: 'High', label: 'High' }
+              { value: 'High', label: 'High' },
             ]}
           />
           <Select
@@ -110,10 +107,10 @@ const FileSearch = ({ branches, onSearch }) => {
             onChange={(e) => handleFilterChange('branch', e.target.value)}
             options={[
               { value: '', label: 'All Branches' },
-              ...branches.map(branch => ({
+              ...branches.map((branch) => ({
                 value: branch._id,
-                label: branch.name
-              }))
+                label: branch.name,
+              })),
             ]}
           />
         </FilterSection>

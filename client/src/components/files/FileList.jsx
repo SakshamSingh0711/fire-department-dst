@@ -6,10 +6,12 @@ import Loading from '../common/Loading';
 import Badge from '../ui/Badge';
 import { fadeIn } from '../../styles/animations';
 
+// Animation wrapper
 const FileListContainer = styled.div`
   animation: ${fadeIn} 0.5s ease forwards;
 `;
 
+// Custom styled badge
 const StatusBadge = styled(Badge)`
   display: inline-flex;
   align-items: center;
@@ -19,6 +21,7 @@ const StatusBadge = styled(Badge)`
 `;
 
 const FileList = ({ files, loading, onFileClick }) => {
+  // Return appropriate icon for file status
   const getStatusIcon = (status) => {
     switch (status) {
       case 'Pending':
@@ -32,12 +35,16 @@ const FileList = ({ files, loading, onFileClick }) => {
     }
   };
 
+  // Define table columns
   const columns = [
     {
       header: 'File No.',
       accessor: 'fileNo',
       cell: (row) => (
-        <span style={{ fontWeight: 500, cursor: 'pointer' }} onClick={() => onFileClick(row)}>
+        <span
+          style={{ fontWeight: 500, cursor: 'pointer' }}
+          onClick={() => onFileClick(row)}
+        >
           {row.fileNo}
         </span>
       ),
@@ -45,7 +52,19 @@ const FileList = ({ files, loading, onFileClick }) => {
     {
       header: 'Subject',
       accessor: 'subject',
-      cell: (row) => <span style={{ maxWidth: '300px', display: 'inline-block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.subject}</span>,
+      cell: (row) => (
+        <span
+          style={{
+            maxWidth: '300px',
+            display: 'inline-block',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {row.subject}
+        </span>
+      ),
     },
     {
       header: 'Branch',
@@ -77,10 +96,14 @@ const FileList = ({ files, loading, onFileClick }) => {
     {
       header: 'Last Updated',
       accessor: 'updatedAt',
-      cell: (row) => new Date(row.updatedAt).toLocaleDateString(),
+      cell: (row) =>
+        row.updatedAt
+          ? new Date(row.updatedAt).toLocaleDateString()
+          : '—',
     },
   ];
 
+  // Show loading spinner
   if (loading) {
     return <Loading />;
   }

@@ -33,15 +33,47 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
+  const handleCreateUser = async (userData) => {
+    try {
+      const response = await api.createUser(userData);
+      setUsers((prev) => [...prev, response.data]);
+      setShowCreateModal(false);
+    } catch (error) {
+      console.error('Error creating user:', error);
+    }
+  };
+
+  const handleUpdateUser = async (userData) => {
+    try {
+      const response = await api.updateUser(selectedUser._id, userData);
+      setUsers((prev) =>
+        prev.map((user) => (user._id === selectedUser._id ? response.data : user))
+      );
+      setSelectedUser(null);
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+    try {
+      await api.deleteUser(userId);
+      setUsers((prev) => prev.filter((user) => user._id !== userId));
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  };
+
   const columns = [
     { header: 'ID', accessor: 'idNumber' },
     { header: 'Name', accessor: 'name' },
     { header: 'Email', accessor: 'email' },
     { header: 'Role', accessor: 'role' },
-    { 
-      header: 'Branch', 
+    {
+      header: 'Branch',
       accessor: 'branch',
-      cell: (row) => row.branch?.name || 'N/A'
+      cell: (row) => row.branch?.name || 'N/A',
     },
     {
       header: 'Actions',
@@ -51,23 +83,18 @@ const UserManagement = () => {
           <Button size="small" onClick={() => setSelectedUser(row)}>
             Edit
           </Button>
-          <Button size="small" variant="outlined" color="error">
+          <Button
+            size="small"
+            variant="outlined"
+            color="error"
+            onClick={() => handleDeleteUser(row._id)}
+          >
             Delete
           </Button>
         </div>
-      )
-    }
+      ),
+    },
   ];
-
-  const handleCreateUser = async (userData) => {
-    try {
-      const response = await api.createUser(userData);
-      setUsers([...users, response.data]);
-      setShowCreateModal(false);
-    } catch (error) {
-      console.error('Error creating user:', error);
-    }
-  };
 
   return (
     <UserManagementContainer>
@@ -75,13 +102,8 @@ const UserManagement = () => {
         <h2>User Management</h2>
         <Button onClick={() => setShowCreateModal(true)}>Add New User</Button>
       </div>
-      
-      <Table 
-        columns={columns} 
-        data={users} 
-        loading={loading}
-        emptyMessage="No users found"
-      />
+
+      <Table columns={columns} data={users} loading={loading} emptyMessage="No users found" />
 
       <Modal
         isOpen={showCreateModal}
@@ -95,16 +117,12 @@ const UserManagement = () => {
         />
       </Modal>
 
-      <Modal
-        isOpen={!!selectedUser}
-        onClose={() => setSelectedUser(null)}
-        title="Edit User"
-      >
+      <Modal isOpen={!!selectedUser} onClose={() => setSelectedUser(null)} title="Edit User">
         {selectedUser && (
           <UserForm
             user={selectedUser}
             branches={branches}
-            onSubmit={() => {}}
+            onSubmit={handleUpdateUser}
             onCancel={() => setSelectedUser(null)}
           />
         )}

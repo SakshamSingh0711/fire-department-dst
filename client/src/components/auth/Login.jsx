@@ -1,11 +1,11 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../contexts/AuthContext';
-import styled from 'styled-components';
-import { pulse , shake } from '../../styles/animations';
-import Button from '../ui/Button';
-import Input from '../ui/Input';
-import Loading from '../common/Loading';
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../contexts/AuthContext";
+import styled from "styled-components";
+import { pulse, shake } from "../../styles/animations";
+import Button from "../ui/Button";
+import Input from "../ui/Input";
+import Loading from "../common/Loading";
 
 const LoginContainer = styled.div`
   display: flex;
@@ -17,7 +17,7 @@ const LoginContainer = styled.div`
       rgba(0, 0, 0, 0.8),
       rgba(30, 30, 30, 0.9)
     ),
-    url('/assets/images/fire-department-bg.jpg') no-repeat center center/cover;
+    url("/assets/images/fire-department-bg.jpg") no-repeat center center/cover;
 `;
 
 const LoginForm = styled.form`
@@ -77,12 +77,12 @@ const LoginButton = styled(Button)`
 
 const Login = () => {
   const [credentials, setCredentials] = useState({
-    id: '',
-    password: '',
+    idNumber: "",
+    password: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { loginUser } = useContext(AuthContext);
+  const { login } = useContext(AuthContext); // ✅ Fix here
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -93,13 +93,15 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
-    const result = await loginUser(credentials);
-    setLoading(false);
-
-    if (!result.success) {
-      setError(result.message);
+    try {
+      await login(credentials); // ✅ Call correct login function
+      navigate("/");
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -108,12 +110,12 @@ const Login = () => {
       <LoginForm onSubmit={handleSubmit}>
         <h2>Fire Department Login</h2>
         <FormGroup>
-          <label htmlFor="id">ID Number</label>
+          <label htmlFor="idNumber">ID Number</label>
           <Input
             type="text"
-            id="id"
-            name="id"
-            value={credentials.id}
+            id="idNumber"
+            name="idNumber"
+            value={credentials.idNumber}
             onChange={handleChange}
             required
             placeholder="Enter your ID"
@@ -133,7 +135,7 @@ const Login = () => {
         </FormGroup>
         {error && <ErrorMessage>{error}</ErrorMessage>}
         <LoginButton type="submit" disabled={loading}>
-          {loading ? <Loading size="small" /> : 'Login'}
+          {loading ? <Loading size="small" /> : "Login"}
         </LoginButton>
       </LoginForm>
     </LoginContainer>

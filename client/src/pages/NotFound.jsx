@@ -32,9 +32,9 @@ const NotFound = () => {
       <h1>404</h1>
       <p>The page you're looking for doesn't exist or has been moved.</p>
       <Button
-        component={Link}
+        as={Link}           // ✅ use styled-components' built-in polymorphic prop
         to="/"
-        startIcon={<FiArrowLeft />}
+        $startIcon={<FiArrowLeft />}   // ✅ use transient prop
       >
         Back to Home
       </Button>

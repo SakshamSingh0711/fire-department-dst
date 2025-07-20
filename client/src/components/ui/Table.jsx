@@ -55,8 +55,8 @@ const EmptyMessage = styled.div`
   border-radius: ${({ theme }) => theme.shape.borderRadius}px;
 `;
 
-const Table = ({ columns, data, emptyMessage, onRowClick }) => {
-  if (data.length === 0) {
+const Table = ({ columns = [], data = [], emptyMessage, onRowClick }) => {
+  if (!Array.isArray(data) || data.length === 0) {
     return <EmptyMessage>{emptyMessage || 'No data available'}</EmptyMessage>;
   }
 
@@ -72,8 +72,8 @@ const Table = ({ columns, data, emptyMessage, onRowClick }) => {
         </TableHeader>
         <TableBody>
           {data.map((row, rowIndex) => (
-            <tr 
-              key={rowIndex} 
+            <tr
+              key={rowIndex}
               onClick={() => onRowClick && onRowClick(row)}
               style={{ cursor: onRowClick ? 'pointer' : 'default' }}
             >

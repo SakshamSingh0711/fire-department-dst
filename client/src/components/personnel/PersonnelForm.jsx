@@ -20,14 +20,22 @@ const PersonnelForm = ({ user = {}, branches = [], onSubmit, onCancel }) => {
   });
 
   useEffect(() => {
-    if (user) {
-      setFormData({
-        name: user.name || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        rank: user.rank || '',
-        branchId: user.currentBranch?._id || '',
-      });
+    if (!user) return;
+
+    const newFormData = {
+      name: user.name || '',
+      email: user.email || '',
+      phone: user.phone || '',
+      rank: user.rank || '',
+      branchId: user.currentBranch?._id || '',
+    };
+
+    const isSame = Object.keys(newFormData).every(
+      (key) => newFormData[key] === formData[key]
+    );
+
+    if (!isSame) {
+      setFormData(newFormData);
     }
   }, [user]);
 
@@ -43,10 +51,33 @@ const PersonnelForm = ({ user = {}, branches = [], onSubmit, onCancel }) => {
 
   return (
     <FormContainer onSubmit={handleSubmit}>
-      <Input name="name" value={formData.name} onChange={handleChange} placeholder="Full Name" required />
-      <Input name="email" value={formData.email} onChange={handleChange} placeholder="Email" type="email" />
-      <Input name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone" type="tel" />
-      <Input name="rank" value={formData.rank} onChange={handleChange} placeholder="Rank" />
+      <Input
+        name="name"
+        value={formData.name}
+        onChange={handleChange}
+        placeholder="Full Name"
+        required
+      />
+      <Input
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+        placeholder="Email"
+        type="email"
+      />
+      <Input
+        name="phone"
+        value={formData.phone}
+        onChange={handleChange}
+        placeholder="Phone"
+        type="tel"
+      />
+      <Input
+        name="rank"
+        value={formData.rank}
+        onChange={handleChange}
+        placeholder="Rank"
+      />
       <Select name="branchId" value={formData.branchId} onChange={handleChange}>
         <option value="">Select Branch</option>
         {branches.map((branch) => (

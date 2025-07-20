@@ -29,6 +29,11 @@ const MovementContent = styled.div`
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 0.25rem;
+    flex-wrap: wrap;
+  }
+
+  strong {
+    margin-right: 0.25rem;
   }
 `;
 
@@ -53,7 +58,9 @@ const FileMovementLog = ({ movements }) => {
               </div>
               <div>
                 <FiCalendar size={14} />
-                {new Date(movement.createdAt).toLocaleString()}
+                {movement.createdAt
+                  ? new Date(movement.createdAt).toLocaleString()
+                  : 'Unknown time'}
               </div>
               {movement.comments && (
                 <div style={{ marginTop: '0.5rem' }}>

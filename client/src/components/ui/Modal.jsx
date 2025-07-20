@@ -22,9 +22,9 @@ const ModalContent = styled.div`
   background: ${({ theme }) => theme.palette.background.paper};
   border-radius: ${({ theme }) => theme.shape.borderRadius}px;
   box-shadow: ${({ theme }) => theme.shadows[5]};
-  width: ${({ size }) => 
-    size === 'small' ? '400px' : 
-    size === 'large' ? '900px' : 
+  width: ${({ size }) =>
+    size === 'small' ? '400px' :
+    size === 'large' ? '900px' :
     '600px'};
   max-width: 95vw;
   max-height: 90vh;
@@ -70,6 +70,12 @@ const ModalBody = styled.div`
 const Modal = ({ isOpen, onClose, title, children, size }) => {
   if (!isOpen) return null;
 
+  const modalRoot = document.getElementById('modal-root');
+  if (!modalRoot) {
+    console.error('Modal root container not found!');
+    return null;
+  }
+
   return createPortal(
     <ModalOverlay onClick={onClose}>
       <ModalContent
@@ -85,7 +91,7 @@ const Modal = ({ isOpen, onClose, title, children, size }) => {
         <ModalBody>{children}</ModalBody>
       </ModalContent>
     </ModalOverlay>,
-    document.getElementById('modal-root')
+    modalRoot
   );
 };
 

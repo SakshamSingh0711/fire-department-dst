@@ -45,7 +45,7 @@ const Branches = () => {
     const fetchBranches = async () => {
       try {
         setIsLoading(true);
-        const response = await api.getBranches();
+        const response = await api.getAllBranches();
         setBranches(response.data);
       } catch (error) {
         console.error('Error fetching branches:', error);

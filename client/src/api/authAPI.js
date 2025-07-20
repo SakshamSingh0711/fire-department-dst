@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = '/api/auth';
+const API_URL = 'http://localhost:5001/api/auth';
 
 const login = async (credentials) => {
   const response = await axios.post(`${API_URL}/login`, credentials);
@@ -13,7 +13,12 @@ const register = async (userData) => {
 };
 
 const getProfile = async () => {
-  const response = await axios.get(`${API_URL}/profile`);
+  const token = localStorage.getItem('token');
+  const response = await axios.get(`${API_URL}/profile`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return response.data;
 };
 

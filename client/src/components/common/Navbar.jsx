@@ -7,6 +7,7 @@ import { logout } from '../../redux/slices/authSlice';
 import { glow } from '../../styles/animations';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
+import { FiMenu } from 'react-icons/fi';
 
 const NavbarContainer = styled.nav`
   background: ${({ theme }) => theme.palette.background.dark};
@@ -16,9 +17,11 @@ const NavbarContainer = styled.nav`
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 1000;
+  left: 0;
+  right: 0;
+  z-index: 1100;
 `;
 
 const Logo = styled.div`
@@ -48,6 +51,21 @@ const NavItems = styled.div`
   display: flex;
   align-items: center;
   gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+const Hamburger = styled.div`
+  display: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: ${({ theme }) => theme.palette.primary.main};
+
+  @media (max-width: 768px) {
+    display: block;
+  }
 `;
 
 const NavLink = styled(Link)`
@@ -128,7 +146,7 @@ const DropdownItem = styled.div`
   }
 `;
 
-const Navbar = () => {
+const Navbar = ({ toggleSidebar }) => {
   const { user } = useSelector((state) => state.auth);
   const { logoutUser } = useContext(AuthContext);
   const dispatch = useDispatch();
@@ -154,6 +172,10 @@ const Navbar = () => {
         <img src="/assets/images/fire-logo.png" alt="Fire Department Logo" />
         <h1>FD Decision Support</h1>
       </Logo>
+
+      <Hamburger onClick={toggleSidebar}>
+        <FiMenu />
+      </Hamburger>
 
       <NavItems>
         {user ? (

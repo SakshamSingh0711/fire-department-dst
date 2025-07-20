@@ -7,23 +7,23 @@ const ButtonStyled = styled.button`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: ${({ size }) => 
-    size === 'small' ? '0.5rem 1rem' : 
-    size === 'large' ? '0.875rem 1.75rem' : 
+  padding: ${({ size }) =>
+    size === 'small' ? '0.5rem 1rem' :
+    size === 'large' ? '0.875rem 1.75rem' :
     '0.75rem 1.5rem'};
-  font-size: ${({ size }) => 
-    size === 'small' ? '0.875rem' : 
-    size === 'large' ? '1.125rem' : 
+  font-size: ${({ size }) =>
+    size === 'small' ? '0.875rem' :
+    size === 'large' ? '1.125rem' :
     '1rem'};
   font-weight: 500;
   border-radius: ${({ theme }) => theme.shape.borderRadius}px;
   transition: all 0.3s ease;
   cursor: pointer;
-  border: ${({ variant }) => (variant === 'outlined' ? '1px solid' : 'none')};
+  border: ${({ $variant }) => ($variant === 'outlined' ? '1px solid' : 'none')};
 
-  ${({ variant, theme, color }) => {
+  ${({ $variant, theme, color }) => {
     const colorValue = color || 'primary';
-    return variant === 'outlined'
+    return $variant === 'outlined'
       ? css`
           background: transparent;
           color: ${theme.palette[colorValue].main};
@@ -50,15 +50,22 @@ const ButtonStyled = styled.button`
     animation: none;
   }
 
-  ${({ fullWidth }) =>
-    fullWidth &&
+  ${({ $fullWidth }) =>
+    $fullWidth &&
     css`
       width: 100%;
     `}
 `;
 
-const Button = ({ children, ...props }) => {
-  return <ButtonStyled {...props}>{children}</ButtonStyled>;
+// Now safely extract startIcon and endIcon before passing to styled-component
+const Button = ({ children, startIcon, endIcon, variant, fullWidth, ...props }) => {
+  return (
+    <ButtonStyled $variant={variant} $fullWidth={fullWidth} {...props}>
+      {startIcon && <span style={{ marginRight: '0.5rem' }}>{startIcon}</span>}
+      {children}
+      {endIcon && <span style={{ marginLeft: '0.5rem' }}>{endIcon}</span>}
+    </ButtonStyled>
+  );
 };
 
 export default Button;

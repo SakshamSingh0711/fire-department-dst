@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../api/authAPI';
 
-// Async thunks
 export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
@@ -9,7 +8,7 @@ export const loginUser = createAsyncThunk(
       const response = await api.login(credentials);
       return response.data;
     } catch (err) {
-      return rejectWithValue(err.response.data);
+      return rejectWithValue(err.response?.data || { message: 'Login failed' });
     }
   }
 );
@@ -21,7 +20,7 @@ export const registerUser = createAsyncThunk(
       const response = await api.register(userData);
       return response.data;
     } catch (err) {
-      return rejectWithValue(err.response.data);
+      return rejectWithValue(err.response?.data || { message: 'Registration failed' });
     }
   }
 );
@@ -33,7 +32,7 @@ export const loadUser = createAsyncThunk(
       const response = await api.getProfile();
       return response.data;
     } catch (err) {
-      return rejectWithValue(err.response.data);
+      return rejectWithValue(err.response?.data || { message: 'Load user failed' });
     }
   }
 );
@@ -50,7 +49,6 @@ export const updateProfile = createAsyncThunk(
   }
 );
 
-// Slice
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
@@ -81,9 +79,9 @@ const authSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        localStorage.setItem('token', action.payload.token);
         state.user = action.payload.user;
         state.token = action.payload.token;
+        localStorage.setItem('token', action.payload.token);
         state.isLoading = false;
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -95,9 +93,9 @@ const authSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
-        localStorage.setItem('token', action.payload.token);
         state.user = action.payload.user;
         state.token = action.payload.token;
+        localStorage.setItem('token', action.payload.token);
         state.isLoading = false;
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -109,10 +107,10 @@ const authSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(loadUser.fulfilled, (state, action) => {
-        state.user = action.payload;
+        state.user = action.payload.user;
         state.isLoading = false;
       })
-      .addCase(loadUser.rejected, (state) => {
+      .addCase(loadUser.rejected, (state, action) => {
         localStorage.removeItem('token');
         state.user = null;
         state.token = null;
@@ -135,4 +133,3 @@ const authSlice = createSlice({
 
 export const { logout, clearError, setCredentials } = authSlice.actions;
 export default authSlice.reducer;
-// export { updateProfile };
