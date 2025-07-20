@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = '/api/files';
+const API_URL = 'http://localhost:5001/api/files';
 
 const getFiles = async () => {
   const response = await axios.get(API_URL);

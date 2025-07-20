@@ -82,7 +82,7 @@ const Login = () => {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login } = useContext(AuthContext); // ✅ Fix here
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -96,7 +96,7 @@ const Login = () => {
     setError("");
 
     try {
-      await login(credentials); // ✅ Call correct login function
+      await login(credentials);
       navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");

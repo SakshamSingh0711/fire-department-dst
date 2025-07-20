@@ -21,3 +21,38 @@ router.post('/register', validate(registerValidation), authController.register);
 router.get('/profile', auth, authController.getProfile);
 
 module.exports = router;
+
+
+
+// const jwt = require('jsonwebtoken');
+// const User = require('../models/User');
+// const bcrypt = require('bcryptjs');
+
+// exports.login = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     // Find user by email
+//     const user = await User.findOne({ email });
+
+//     if (!user)
+//       return res.status(400).json({ message: 'Invalid email or password' });
+
+//     // Check password
+//     const isMatch = await bcrypt.compare(password, user.password);
+//     if (!isMatch)
+//       return res.status(400).json({ message: 'Invalid email or password' });
+
+//     // ✅ Generate token with user id and role
+//     const token = jwt.sign(
+//       { id: user._id, role: user.role },
+//       process.env.JWT_SECRET,
+//       { expiresIn: '7d' }
+//     );
+
+//     res.status(200).json({ token }); // OR send user too if needed
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// };

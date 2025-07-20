@@ -1,5 +1,4 @@
-// ✅ FILE: src/components/common/Sidebar.jsx
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
 import { AuthContext } from '../../contexts/AuthContext';
@@ -12,7 +11,6 @@ import {
   FiChevronRight,
 } from 'react-icons/fi';
 
-// Animations
 const slideDown = keyframes`
   from { max-height: 0; opacity: 0; }
   to { max-height: 500px; opacity: 1; }
@@ -37,7 +35,7 @@ const SidebarContainer = styled.div`
 
   @media (max-width: 768px) {
     transform: translateX(-100%);
-    ${({ $isOpen }) => $isOpen && `transform: translateX(0);`}
+    ${({ $isOpen }) => $isOpen && css`transform: translateX(0);`}
   }
 `;
 
@@ -89,7 +87,7 @@ const MenuText = styled.span`
 
 const ExpandIcon = styled.span`
   transition: transform 0.3s ease;
-  ${({ $isOpen }) => $isOpen && `transform: rotate(90deg);`}
+  ${({ $isOpen }) => $isOpen && css`transform: rotate(90deg);`}
 `;
 
 const SubMenu = styled.div`
@@ -118,65 +116,82 @@ const SubMenuLink = styled(Link)`
 `;
 
 const Sidebar = ({ isOpen }) => {
-  const { user } = useContext(AuthContext);
+  const { user: contextUser } = useContext(AuthContext);
   const location = useLocation();
-
   const [openMenus, setOpenMenus] = useState({
-    files: location.pathname.includes('/files'),
-    personnel: location.pathname.includes('/personnel'),
-    admin: location.pathname.includes('/admin'),
-    branches: location.pathname.includes('/branches'),
+    files: location.pathname.startsWith('/files'),
+    personnel: location.pathname.startsWith('/personnel'),
+    admin: location.pathname.startsWith('/admin'),
+    branches: location.pathname.startsWith('/branches'),
   });
+
+  const user = useMemo(() => {
+    if (contextUser && contextUser.role) return contextUser;
+    try {
+      const stored = JSON.parse(localStorage.getItem('user'));
+      return stored || null;
+    } catch {
+      return null;
+    }
+  }, [contextUser]);
 
   const toggleMenu = (menu) => {
     setOpenMenus((prev) => ({ ...prev, [menu]: !prev[menu] }));
   };
 
   const isActive = (path) => location.pathname === path;
+  const role = user?.role?.toLowerCase();
+
+  if (!role) return null;
 
   return (
     <SidebarContainer $isOpen={isOpen}>
       <SidebarHeader>Main Menu</SidebarHeader>
 
       <MenuItem>
-        <MenuLink to="/" $active={isActive('/')}> <MenuIcon><FiHome /></MenuIcon>
+        <MenuLink to="/" $active={isActive('/')}> 
+          <MenuIcon><FiHome /></MenuIcon>
           <MenuText>Dashboard</MenuText>
         </MenuLink>
       </MenuItem>
 
-      <MenuItem>
-        <MenuLink as="div" onClick={() => toggleMenu('files')} $active={location.pathname.includes('/files')}>
-          <MenuIcon><FiFile /></MenuIcon>
-          <MenuText>File Tracking</MenuText>
-          <ExpandIcon $isOpen={openMenus.files}>
-            {openMenus.files ? <FiChevronDown /> : <FiChevronRight />}
-          </ExpandIcon>
-        </MenuLink>
-        <SubMenu $isOpen={openMenus.files}>
-          <SubMenuLink to="/files/new" $active={isActive('/files/new')}>Create New File</SubMenuLink>
-          <SubMenuLink to="/files/pending" $active={isActive('/files/pending')}>Pending Files</SubMenuLink>
-          <SubMenuLink to="/files/completed" $active={isActive('/files/completed')}>Completed Files</SubMenuLink>
-        </SubMenu>
-      </MenuItem>
-
-      <MenuItem>
-        <MenuLink as="div" onClick={() => toggleMenu('personnel')} $active={location.pathname.includes('/personnel')}>
-          <MenuIcon><FiUsers /></MenuIcon>
-          <MenuText>Personnel</MenuText>
-          <ExpandIcon $isOpen={openMenus.personnel}>
-            {openMenus.personnel ? <FiChevronDown /> : <FiChevronRight />}
-          </ExpandIcon>
-        </MenuLink>
-        <SubMenu $isOpen={openMenus.personnel}>
-          <SubMenuLink to="/personnel/list" $active={isActive('/personnel/list')}>All Personnel</SubMenuLink>
-          <SubMenuLink to="/personnel/transfers" $active={isActive('/personnel/transfers')}>Transfer Requests</SubMenuLink>
-          <SubMenuLink to="/personnel/vacancies" $active={isActive('/personnel/vacancies')}>Vacancy Management</SubMenuLink>
-        </SubMenu>
-      </MenuItem>
-
-      {user?.role === 'Master' && (
+      {(role === 'master' || role === 'branch' || role === 'office') && (
         <MenuItem>
-          <MenuLink as="div" onClick={() => toggleMenu('admin')} $active={location.pathname.includes('/admin')}>
+          <MenuLink as="div" onClick={() => toggleMenu('files')} $active={location.pathname.startsWith('/files')}>
+            <MenuIcon><FiFile /></MenuIcon>
+            <MenuText>File Tracking</MenuText>
+            <ExpandIcon $isOpen={openMenus.files}>
+              {openMenus.files ? <FiChevronDown /> : <FiChevronRight />}
+            </ExpandIcon>
+          </MenuLink>
+          <SubMenu $isOpen={openMenus.files}>
+            <SubMenuLink to="/files/new" $active={isActive('/files/new')}>Create New File</SubMenuLink>
+            <SubMenuLink to="/files/pending" $active={isActive('/files/pending')}>Pending Files</SubMenuLink>
+            <SubMenuLink to="/files/completed" $active={isActive('/files/completed')}>Completed Files</SubMenuLink>
+          </SubMenu>
+        </MenuItem>
+      )}
+
+      {(role === 'master' || role === 'branch' || role === 'office') && (
+        <MenuItem>
+          <MenuLink as="div" onClick={() => toggleMenu('personnel')} $active={location.pathname.startsWith('/personnel')}>
+            <MenuIcon><FiUsers /></MenuIcon>
+            <MenuText>Personnel</MenuText>
+            <ExpandIcon $isOpen={openMenus.personnel}>
+              {openMenus.personnel ? <FiChevronDown /> : <FiChevronRight />}
+            </ExpandIcon>
+          </MenuLink>
+          <SubMenu $isOpen={openMenus.personnel}>
+            <SubMenuLink to="/personnel/list" $active={isActive('/personnel/list')}>All Personnel</SubMenuLink>
+            <SubMenuLink to="/personnel/transfers" $active={isActive('/personnel/transfers')}>Transfer Requests</SubMenuLink>
+            <SubMenuLink to="/personnel/vacancies" $active={isActive('/personnel/vacancies')}>Vacancy Management</SubMenuLink>
+          </SubMenu>
+        </MenuItem>
+      )}
+
+      {role === 'master' && (
+        <MenuItem>
+          <MenuLink as="div" onClick={() => toggleMenu('admin')} $active={location.pathname.startsWith('/admin')}>
             <MenuIcon><FiSettings /></MenuIcon>
             <MenuText>Admin</MenuText>
             <ExpandIcon $isOpen={openMenus.admin}>
@@ -191,19 +206,21 @@ const Sidebar = ({ isOpen }) => {
         </MenuItem>
       )}
 
-      <MenuItem>
-        <MenuLink as="div" onClick={() => toggleMenu('branches')} $active={location.pathname.includes('/branches')}>
-          <MenuIcon><FiUsers /></MenuIcon>
-          <MenuText>Branches</MenuText>
-          <ExpandIcon $isOpen={openMenus.branches}>
-            {openMenus.branches ? <FiChevronDown /> : <FiChevronRight />}
-          </ExpandIcon>
-        </MenuLink>
-        <SubMenu $isOpen={openMenus.branches}>
-          <SubMenuLink to="/branches/list" $active={isActive('/branches/list')}>All Branches</SubMenuLink>
-          <SubMenuLink to="/branches/workspaces" $active={isActive('/branches/workspaces')}>Branch Workspaces</SubMenuLink>
-        </SubMenu>
-      </MenuItem>
+      {(role === 'master' || role === 'branch' || role === 'office') && (
+        <MenuItem>
+          <MenuLink as="div" onClick={() => toggleMenu('branches')} $active={location.pathname.startsWith('/branches')}>
+            <MenuIcon><FiUsers /></MenuIcon>
+            <MenuText>Branches</MenuText>
+            <ExpandIcon $isOpen={openMenus.branches}>
+              {openMenus.branches ? <FiChevronDown /> : <FiChevronRight />}
+            </ExpandIcon>
+          </MenuLink>
+          <SubMenu $isOpen={openMenus.branches}>
+            <SubMenuLink to="/branches/list" $active={isActive('/branches/list')}>All Branches</SubMenuLink>
+            <SubMenuLink to="/branches/workspaces" $active={isActive('/branches/workspaces')}>Branch Workspaces</SubMenuLink>
+          </SubMenu>
+        </MenuItem>
+      )}
     </SidebarContainer>
   );
 };

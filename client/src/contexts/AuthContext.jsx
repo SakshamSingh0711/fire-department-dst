@@ -6,7 +6,7 @@ export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // ✅ Added loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -14,13 +14,15 @@ export const AuthContextProvider = ({ children }) => {
       try {
         const decoded = jwtDecode(token);
         setUser(decoded);
+        localStorage.setItem('user', JSON.stringify(decoded)); // ✅ Save to localStorage
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       } catch (err) {
         console.error("Token decode failed:", err);
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
       }
     }
-    setLoading(false); // ✅ Done loading
+    setLoading(false);
   }, []);
 
   const login = async (credentials) => {
@@ -30,11 +32,13 @@ export const AuthContextProvider = ({ children }) => {
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     const decoded = jwtDecode(token);
     setUser(decoded);
+    localStorage.setItem('user', JSON.stringify(decoded)); // ✅ Save to localStorage
     return { success: true };
   };
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     delete axios.defaults.headers.common['Authorization'];
     setUser(null);
   };

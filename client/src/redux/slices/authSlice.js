@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../api/authAPI';
+import { jwtDecode } from 'jwt-decode';
 
+// Async Thunks
 export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
@@ -29,10 +31,14 @@ export const loadUser = createAsyncThunk(
   'auth/loadUser',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.getProfile();
-      return response.data;
+      const token = localStorage.getItem('token');
+      if (token) {
+        const user = jwtDecode(token);
+        return user;
+      }
+      return rejectWithValue({ message: 'No token found' });
     } catch (err) {
-      return rejectWithValue(err.response?.data || { message: 'Load user failed' });
+      return rejectWithValue({ message: 'Invalid token' });
     }
   }
 );
@@ -49,17 +55,35 @@ export const updateProfile = createAsyncThunk(
   }
 );
 
+// Initial State
+const token = localStorage.getItem('token');
+const userFromStorage = localStorage.getItem('user');
+let decodedUser = null;
+
+if (token && userFromStorage) {
+  try {
+    decodedUser = JSON.parse(userFromStorage);
+  } catch (e) {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+  }
+}
+
+const initialState = {
+  user: decodedUser,
+  token: token || null,
+  isLoading: false,
+  error: null
+};
+
+// Slice
 const authSlice = createSlice({
   name: 'auth',
-  initialState: {
-    user: null,
-    token: localStorage.getItem('token'),
-    isLoading: false,
-    error: null
-  },
+  initialState,
   reducers: {
     logout: (state) => {
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
       state.user = null;
       state.token = null;
       state.error = null;
@@ -68,20 +92,28 @@ const authSlice = createSlice({
       state.error = null;
     },
     setCredentials: (state, action) => {
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-      localStorage.setItem('token', action.payload.token);
+      const { token } = action.payload;
+      const user = jwtDecode(token);
+      state.token = token;
+      state.user = user;
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
     }
   },
   extraReducers: (builder) => {
     builder
+      // Login
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
+        state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        localStorage.setItem('token', action.payload.token);
+        const { token } = action.payload;
+        const user = jwtDecode(token);
+        state.token = token;
+        state.user = user;
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
         state.isLoading = false;
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -89,13 +121,18 @@ const authSlice = createSlice({
         state.isLoading = false;
       })
 
+      // Register
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
+        state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        localStorage.setItem('token', action.payload.token);
+        const { token } = action.payload;
+        const user = jwtDecode(token);
+        state.token = token;
+        state.user = user;
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
         state.isLoading = false;
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -103,25 +140,32 @@ const authSlice = createSlice({
         state.isLoading = false;
       })
 
+      // Load User
       .addCase(loadUser.pending, (state) => {
         state.isLoading = true;
+        state.error = null;
       })
       .addCase(loadUser.fulfilled, (state, action) => {
-        state.user = action.payload.user;
+        state.user = action.payload;
         state.isLoading = false;
       })
       .addCase(loadUser.rejected, (state, action) => {
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
         state.user = null;
         state.token = null;
         state.isLoading = false;
+        state.error = action.payload?.message || 'Load user failed';
       })
 
+      // Update Profile
       .addCase(updateProfile.pending, (state) => {
         state.isLoading = true;
+        state.error = null;
       })
       .addCase(updateProfile.fulfilled, (state, action) => {
         state.user = action.payload;
+        localStorage.setItem('user', JSON.stringify(action.payload));
         state.isLoading = false;
       })
       .addCase(updateProfile.rejected, (state, action) => {
@@ -131,5 +175,6 @@ const authSlice = createSlice({
   }
 });
 
+// Export actions and reducer
 export const { logout, clearError, setCredentials } = authSlice.actions;
 export default authSlice.reducer;
