@@ -83,21 +83,20 @@ const Login = () => {
 
   const { user, isLoading, error } = useSelector((state) => state.auth);
 
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(loginUser(credentials))
-      .unwrap()
-      .then(() => {
-        navigate("/"); // only navigate after successful login
-      })
-      .catch(() => {
-        // error will be shown from redux state
-      });
+    dispatch(loginUser(credentials));
   };
 
   return (

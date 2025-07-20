@@ -1,12 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { darkTheme } from './styles/theme';
 import { GlobalStyles } from './styles/GlobalStyles';
 import store, { persistor } from './redux/store';
-import { AuthContextProvider, AuthContext } from './contexts/AuthContext';
 import Navbar from './components/common/Navbar';
 import Sidebar from './components/common/Sidebar';
 import Footer from './components/common/Footer';
@@ -22,6 +21,7 @@ import Register from './components/auth/Register';
 import NotFound from './pages/NotFound';
 import useMediaQuery from './hooks/useMediaQuery';
 import styled from 'styled-components';
+import ProtectedRoute from './components/common/ProtectedRoute';
 
 const AppContainer = styled.div`
   display: flex;
@@ -47,20 +47,6 @@ const ContentWrapper = styled.div`
   }
 `;
 
-const PrivateRoute = ({ children, roles }) => {
-  const { user, loading } = useContext(AuthContext);
-
-  if (loading) return null;
-
-  if (!user) return <Navigate to="/login" />;
-
-  if (roles && !roles.includes(user.role)) {
-    return <Navigate to="/login" />;
-  }
-
-  return children;
-};
-
 const App = () => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
@@ -72,87 +58,85 @@ const App = () => {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <AuthContextProvider>
-          <Router>
-            <ThemeProvider theme={darkTheme}>
-              <GlobalStyles />
-              <AppContainer>
-                <Navbar 
+        <Router>
+          <ThemeProvider theme={darkTheme}>
+            <GlobalStyles />
+            <AppContainer>
+              <Navbar 
+                toggleSidebar={toggleSidebar} 
+                isMobile={isMobile} 
+                sidebarOpen={sidebarOpen}
+              />
+              <MainContent>
+                <Sidebar 
+                  isOpen={sidebarOpen} 
                   toggleSidebar={toggleSidebar} 
                   isMobile={isMobile} 
-                  sidebarOpen={sidebarOpen}
                 />
-                <MainContent>
-                  <Sidebar 
-                    isOpen={sidebarOpen} 
-                    toggleSidebar={toggleSidebar} 
-                    isMobile={isMobile} 
-                  />
-                  <ContentWrapper 
-                    $sidebarOpen={sidebarOpen} 
-                    $isMobile={isMobile}
-                  >
-                    <Alert />
-                    <Routes>
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/register" element={<Register />} />
-                      <Route 
-                        path="/"
-                        element={
-                          <PrivateRoute>
-                            <Home />
-                          </PrivateRoute>
-                        }
-                      />
-                      <Route
-                        path="/branches/*"
-                        element={
-                          <PrivateRoute>
-                            <Branches />
-                          </PrivateRoute>
-                        }
-                      />
-                      <Route
-                        path="/files/*"
-                        element={
-                          <PrivateRoute>
-                            <Files />
-                          </PrivateRoute>
-                        }
-                      />
-                      <Route
-                        path="/personnel/*"
-                        element={
-                          <PrivateRoute>
-                            <Personnel />
-                          </PrivateRoute>
-                        }
-                      />
-                      <Route
-                        path="/admin/*"
-                        element={
-                          <PrivateRoute roles={["Master"]}>
-                            <Admin />
-                          </PrivateRoute>
-                        }
-                      />
-                      <Route
-                        path="/profile"
-                        element={
-                          <PrivateRoute>
-                            <Profile />
-                          </PrivateRoute>
-                        }
-                      />
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </ContentWrapper>
-                </MainContent>
-                <Footer />
-              </AppContainer>
-            </ThemeProvider>
-          </Router>
-        </AuthContextProvider>
+                <ContentWrapper 
+                  $sidebarOpen={sidebarOpen} 
+                  $isMobile={isMobile}
+                >
+                  <Alert />
+                  <Routes>
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route 
+                      path="/"
+                      element={
+                        <ProtectedRoute>
+                          <Home />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/branches/*"
+                      element={
+                        <ProtectedRoute>
+                          <Branches />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/files/*"
+                      element={
+                        <ProtectedRoute>
+                          <Files />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/personnel/*"
+                      element={
+                        <ProtectedRoute>
+                          <Personnel />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/*"
+                      element={
+                        <ProtectedRoute roles={["Master"]}>
+                          <Admin />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/profile"
+                      element={
+                        <ProtectedRoute>
+                          <Profile />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </ContentWrapper>
+              </MainContent>
+              <Footer />
+            </AppContainer>
+          </ThemeProvider>
+        </Router>
       </PersistGate>
     </Provider>
   );

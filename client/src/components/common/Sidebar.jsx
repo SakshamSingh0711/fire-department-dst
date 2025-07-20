@@ -1,7 +1,7 @@
-import React, { useState, useContext, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
-import { AuthContext } from '../../contexts/AuthContext';
 import {
   FiHome, FiFile, FiUsers, FiSettings,
   FiChevronDown, FiChevronRight,
@@ -108,8 +108,19 @@ const SubMenuLink = styled(Link)`
 `;
 
 const Sidebar = ({ isOpen }) => {
-  const { user: contextUser } = useContext(AuthContext);
   const location = useLocation();
+  const reduxUser = useSelector((state) => state.auth.user);
+
+  const user = useMemo(() => {
+    if (reduxUser?.role) return reduxUser;
+    try {
+      return JSON.parse(localStorage.getItem('user')) || null;
+    } catch {
+      return null;
+    }
+  }, [reduxUser]);
+
+  const role = user?.role?.toLowerCase();
 
   const [openMenus, setOpenMenus] = useState({
     files: location.pathname.startsWith('/files'),
@@ -117,17 +128,6 @@ const Sidebar = ({ isOpen }) => {
     admin: location.pathname.startsWith('/admin'),
     branches: location.pathname.startsWith('/branches'),
   });
-
-  const user = useMemo(() => {
-    if (contextUser?.role) return contextUser;
-    try {
-      return JSON.parse(localStorage.getItem('user')) || null;
-    } catch {
-      return null;
-    }
-  }, [contextUser]);
-
-  const role = user?.role?.toLowerCase();
 
   const toggleMenu = (menu) => {
     setOpenMenus((prev) => ({ ...prev, [menu]: !prev[menu] }));
