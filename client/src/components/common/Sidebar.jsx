@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+// ✅ FILE: src/components/common/Sidebar.jsx
+import React, { useState, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
-import { useSelector } from 'react-redux';
+import { AuthContext } from '../../contexts/AuthContext';
 import {
   FiHome,
   FiFile,
@@ -13,25 +14,13 @@ import {
 
 // Animations
 const slideDown = keyframes`
-  from {
-    max-height: 0;
-    opacity: 0;
-  }
-  to {
-    max-height: 500px;
-    opacity: 1;
-  }
+  from { max-height: 0; opacity: 0; }
+  to { max-height: 500px; opacity: 1; }
 `;
 
 const slideUp = keyframes`
-  from {
-    max-height: 500px;
-    opacity: 1;
-  }
-  to {
-    max-height: 0;
-    opacity: 0;
-  }
+  from { max-height: 500px; opacity: 1; }
+  to { max-height: 0; opacity: 0; }
 `;
 
 const SidebarContainer = styled.div`
@@ -42,7 +31,7 @@ const SidebarContainer = styled.div`
   top: 70px;
   left: 0;
   overflow-y: auto;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease;
   z-index: 900;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
 
@@ -73,7 +62,6 @@ const MenuLink = styled(Link)`
   text-decoration: none;
   transition: background 0.2s ease;
   border-left: 3px solid transparent;
-  cursor: pointer;
 
   &:hover {
     background: ${({ theme }) => theme.palette.primary.transparent};
@@ -130,7 +118,7 @@ const SubMenuLink = styled(Link)`
 `;
 
 const Sidebar = ({ isOpen }) => {
-  const { user } = useSelector((state) => state.auth);
+  const { user } = useContext(AuthContext);
   const location = useLocation();
 
   const [openMenus, setOpenMenus] = useState({
@@ -151,8 +139,7 @@ const Sidebar = ({ isOpen }) => {
       <SidebarHeader>Main Menu</SidebarHeader>
 
       <MenuItem>
-        <MenuLink to="/" $active={isActive('/')}>
-          <MenuIcon><FiHome /></MenuIcon>
+        <MenuLink to="/" $active={isActive('/')}> <MenuIcon><FiHome /></MenuIcon>
           <MenuText>Dashboard</MenuText>
         </MenuLink>
       </MenuItem>
