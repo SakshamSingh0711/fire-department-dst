@@ -13,11 +13,11 @@ const LoginContainer = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(
+  ${'' /* background: linear-gradient(
       to bottom,
       rgba(0, 0, 0, 0.8),
       rgba(30, 30, 30, 0.9)
-    ),
+    ), */}
     url("/assets/images/fire-department-bg.jpg") no-repeat center center/cover;
 `;
 

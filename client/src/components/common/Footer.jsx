@@ -13,7 +13,7 @@ const Footer = () => {
   return (
     <FooterContainer>
       <p>Fire Department Decision Support Tool &copy; {new Date().getFullYear()}</p>
-      <p>Version 1.0.0</p>
+      <p>&copy; MocSoft Solutions - SakshamSingh0711</p>
     </FooterContainer>
   );
 };

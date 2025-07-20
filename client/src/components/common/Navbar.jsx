@@ -1,10 +1,10 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../../redux/slices/authSlice';
-import { glow } from '../../styles/animations';
-import Badge from '../ui/Badge';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../redux/slices/authSlice";
+import { glow } from "../../styles/animations";
+import Badge from "../ui/Badge";
 
 const NavbarContainer = styled.nav`
   background: ${({ theme }) => theme.palette.background.dark};
@@ -25,7 +25,7 @@ const Logo = styled.div`
   cursor: pointer;
 
   img {
-    height: 40px;
+    height: 60px;
     margin-right: 1rem;
   }
 
@@ -133,12 +133,12 @@ const Navbar = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/login');
+    navigate("/login");
   };
 
   const getInitials = (name) => {
-    if (!name) return 'U';
-    const parts = name.split(' ');
+    if (!name) return "U";
+    const parts = name.split(" ");
     return parts.length > 1
       ? `${parts[0][0]}${parts[parts.length - 1][0]}`
       : parts[0][0];
@@ -146,11 +146,10 @@ const Navbar = () => {
 
   return (
     <NavbarContainer>
-      <Logo onClick={() => navigate('/')}>
-        <img src="/assets/images/fire-logo.png" alt="Fire Department Logo" />
-        <h1>FD Decision Support</h1>
+      <Logo onClick={() => navigate("/")}>
+        <img src="/image.png" alt="Fire Department Logo" />
+        <h1> FD-DST : Fire Department Decision Support Tool</h1>
       </Logo>
-
       <NavItems>
         {!user ? (
           <>
@@ -162,13 +161,13 @@ const Navbar = () => {
             <NavLink to="/files">File Tracking</NavLink>
             <NavLink to="/personnel">Personnel</NavLink>
             <NavLink to="/branches">Branches</NavLink>
-            {user?.role === 'Master' && <NavLink to="/admin">Admin</NavLink>}
+            {user?.role === "Master" && <NavLink to="/admin">Admin</NavLink>}
             <UserInfo>
               <Badge content={user.role} position="top-right">
                 <UserAvatar>{getInitials(user.name)}</UserAvatar>
               </Badge>
               <DropdownMenu>
-                <DropdownItem onClick={() => navigate('/profile')}>
+                <DropdownItem onClick={() => navigate("/profile")}>
                   Profile
                 </DropdownItem>
                 <DropdownItem onClick={handleLogout}>Logout</DropdownItem>
