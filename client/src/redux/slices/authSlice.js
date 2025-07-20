@@ -8,7 +8,9 @@ export const loginUser = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await api.login(credentials);
-      return response.data;
+      const { token } = response.data;
+      if (!token) throw new Error('No token returned from server');
+      return { token };
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: 'Login failed' });
     }
@@ -20,7 +22,9 @@ export const registerUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await api.register(userData);
-      return response.data;
+      const { token } = response.data;
+      if (!token) throw new Error('Token not found in response');
+      return { token };
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: 'Registration failed' });
     }
@@ -32,13 +36,11 @@ export const loadUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
-      if (token) {
-        const user = jwtDecode(token);
-        return user;
-      }
-      return rejectWithValue({ message: 'No token found' });
+      if (!token) throw new Error('No token found');
+      const decoded = jwtDecode(token);
+      return decoded;
     } catch (err) {
-      return rejectWithValue({ message: 'Invalid token' });
+      return rejectWithValue({ message: 'Invalid or expired token' });
     }
   }
 );
@@ -55,28 +57,25 @@ export const updateProfile = createAsyncThunk(
   }
 );
 
-// Initial State
-const token = localStorage.getItem('token');
-const userFromStorage = localStorage.getItem('user');
-let decodedUser = null;
+// Load initial token and user from localStorage
+let initialToken = localStorage.getItem('token') || null;
+let initialUser = null;
 
-if (token && userFromStorage) {
-  try {
-    decodedUser = JSON.parse(userFromStorage);
-  } catch (e) {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-  }
+try {
+  if (initialToken) initialUser = jwtDecode(initialToken);
+} catch {
+  initialToken = null;
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
 }
 
 const initialState = {
-  user: decodedUser,
-  token: token || null,
+  token: initialToken,
+  user: initialUser,
   isLoading: false,
   error: null
 };
 
-// Slice
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -84,8 +83,8 @@ const authSlice = createSlice({
     logout: (state) => {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      state.user = null;
       state.token = null;
+      state.user = null;
       state.error = null;
     },
     clearError: (state) => {
@@ -102,7 +101,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Login
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -121,7 +119,6 @@ const authSlice = createSlice({
         state.isLoading = false;
       })
 
-      // Register
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -140,7 +137,6 @@ const authSlice = createSlice({
         state.isLoading = false;
       })
 
-      // Load User
       .addCase(loadUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -150,15 +146,14 @@ const authSlice = createSlice({
         state.isLoading = false;
       })
       .addCase(loadUser.rejected, (state, action) => {
+        state.token = null;
+        state.user = null;
+        state.error = action.payload?.message || 'User loading failed';
+        state.isLoading = false;
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        state.user = null;
-        state.token = null;
-        state.isLoading = false;
-        state.error = action.payload?.message || 'Load user failed';
       })
 
-      // Update Profile
       .addCase(updateProfile.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -175,6 +170,5 @@ const authSlice = createSlice({
   }
 });
 
-// Export actions and reducer
 export const { logout, clearError, setCredentials } = authSlice.actions;
 export default authSlice.reducer;

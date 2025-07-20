@@ -1,14 +1,10 @@
-import React, { useState, useContext, useEffect, useMemo } from 'react';
+import React, { useState, useContext, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
 import { AuthContext } from '../../contexts/AuthContext';
 import {
-  FiHome,
-  FiFile,
-  FiUsers,
-  FiSettings,
-  FiChevronDown,
-  FiChevronRight,
+  FiHome, FiFile, FiUsers, FiSettings,
+  FiChevronDown, FiChevronRight,
 } from 'react-icons/fi';
 
 const slideDown = keyframes`
@@ -48,9 +44,7 @@ const SidebarHeader = styled.div`
   color: ${({ theme }) => theme.palette.primary.main};
 `;
 
-const MenuItem = styled.div`
-  margin: 0.25rem 0;
-`;
+const MenuItem = styled.div`margin: 0.25rem 0;`;
 
 const MenuLink = styled(Link)`
   display: flex;
@@ -81,9 +75,7 @@ const MenuIcon = styled.span`
   align-items: center;
 `;
 
-const MenuText = styled.span`
-  flex-grow: 1;
-`;
+const MenuText = styled.span`flex-grow: 1;`;
 
 const ExpandIcon = styled.span`
   transition: transform 0.3s ease;
@@ -118,6 +110,7 @@ const SubMenuLink = styled(Link)`
 const Sidebar = ({ isOpen }) => {
   const { user: contextUser } = useContext(AuthContext);
   const location = useLocation();
+
   const [openMenus, setOpenMenus] = useState({
     files: location.pathname.startsWith('/files'),
     personnel: location.pathname.startsWith('/personnel'),
@@ -126,21 +119,21 @@ const Sidebar = ({ isOpen }) => {
   });
 
   const user = useMemo(() => {
-    if (contextUser && contextUser.role) return contextUser;
+    if (contextUser?.role) return contextUser;
     try {
-      const stored = JSON.parse(localStorage.getItem('user'));
-      return stored || null;
+      return JSON.parse(localStorage.getItem('user')) || null;
     } catch {
       return null;
     }
   }, [contextUser]);
+
+  const role = user?.role?.toLowerCase();
 
   const toggleMenu = (menu) => {
     setOpenMenus((prev) => ({ ...prev, [menu]: !prev[menu] }));
   };
 
   const isActive = (path) => location.pathname === path;
-  const role = user?.role?.toLowerCase();
 
   if (!role) return null;
 
@@ -149,7 +142,7 @@ const Sidebar = ({ isOpen }) => {
       <SidebarHeader>Main Menu</SidebarHeader>
 
       <MenuItem>
-        <MenuLink to="/" $active={isActive('/')}> 
+        <MenuLink to="/" $active={isActive('/')}>
           <MenuIcon><FiHome /></MenuIcon>
           <MenuText>Dashboard</MenuText>
         </MenuLink>

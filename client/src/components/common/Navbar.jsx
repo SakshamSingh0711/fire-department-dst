@@ -1,11 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { AuthContext } from '../../contexts/AuthContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice';
 import { glow } from '../../styles/animations';
-import Button from '../ui/Button';
 import Badge from '../ui/Badge';
 
 const NavbarContainer = styled.nav`
@@ -130,13 +128,11 @@ const DropdownItem = styled.div`
 
 const Navbar = () => {
   const { user } = useSelector((state) => state.auth);
-  const { logoutUser } = useContext(AuthContext);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     dispatch(logout());
-    logoutUser();
     navigate('/login');
   };
 

@@ -1,11 +1,12 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../contexts/AuthContext";
 import styled from "styled-components";
-import { pulse, shake } from "../../styles/animations";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../../redux/slices/authSlice";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 import Loading from "../common/Loading";
+import { pulse, shake } from "../../styles/animations";
 
 const LoginContainer = styled.div`
   display: flex;
@@ -76,14 +77,11 @@ const LoginButton = styled(Button)`
 `;
 
 const Login = () => {
-  const [credentials, setCredentials] = useState({
-    idNumber: "",
-    password: "",
-  });
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const { login } = useContext(AuthContext);
+  const [credentials, setCredentials] = useState({ idNumber: "", password: "" });
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { user, isLoading, error } = useSelector((state) => state.auth);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -92,17 +90,14 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    try {
-      await login(credentials);
-      navigate("/");
-    } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
-    } finally {
-      setLoading(false);
-    }
+    dispatch(loginUser(credentials))
+      .unwrap()
+      .then(() => {
+        navigate("/"); // only navigate after successful login
+      })
+      .catch(() => {
+        // error will be shown from redux state
+      });
   };
 
   return (
@@ -134,8 +129,8 @@ const Login = () => {
           />
         </FormGroup>
         {error && <ErrorMessage>{error}</ErrorMessage>}
-        <LoginButton type="submit" disabled={loading}>
-          {loading ? <Loading size="small" /> : "Login"}
+        <LoginButton type="submit" disabled={isLoading}>
+          {isLoading ? <Loading size="small" /> : "Login"}
         </LoginButton>
       </LoginForm>
     </LoginContainer>
