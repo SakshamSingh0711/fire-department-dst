@@ -9,16 +9,36 @@ const getBranchById = async (branchId) => {
 };
 
 const createBranch = async (branchData) => {
-  const branch = new Branch(branchData);
+  const { name, code, phone, email, head, isActive } = branchData;
+
+  const branch = new Branch({
+    name,
+    code,
+    phone,
+    email,
+    ...(head && { head }),
+    ...(typeof isActive !== 'undefined' && { isActive }),
+  });
+
   return await branch.save();
 };
 
 const updateBranch = async (branchId, branchData) => {
-  return await Branch.findByIdAndUpdate(
-    branchId,
-    branchData,
-    { new: true, runValidators: true }
-  ).populate('head', 'name email');
+  const { name, code, phone, email, head, isActive } = branchData;
+
+  const updatePayload = {
+    ...(name && { name }),
+    ...(code && { code }),
+    ...(phone && { phone }),
+    ...(email && { email }),
+    ...(typeof head !== 'undefined' && { head }),
+    ...(typeof isActive !== 'undefined' && { isActive }),
+  };
+
+  return await Branch.findByIdAndUpdate(branchId, updatePayload, {
+    new: true,
+    runValidators: true,
+  }).populate('head', 'name email');
 };
 
 const deleteBranch = async (branchId) => {

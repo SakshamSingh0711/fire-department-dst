@@ -8,11 +8,11 @@ import Input from "../ui/Input";
 import Loading from "../common/Loading";
 import { pulse, shake } from "../../styles/animations";
 
+
 const LoginContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
   ${'' /* background: linear-gradient(
       to bottom,
       rgba(0, 0, 0, 0.8),
@@ -26,6 +26,7 @@ const LoginForm = styled.form`
   padding: 2.5rem;
   border-radius: ${({ theme }) => theme.shape.borderRadius}px;
   width: 100%;
+  margin-right: 17rem !important;
   max-width: 400px;
   box-shadow: ${({ theme }) => theme.shadows[4]};
   animation: fadeIn 0.5s ease forwards;
@@ -45,7 +46,7 @@ const FormGroup = styled.div`
     display: block;
     margin-bottom: 0.5rem;
     color: ${({ theme }) => theme.palette.text.primary};
-    font-weight: 500;
+    font-weight: 800;
   }
 `;
 
@@ -98,7 +99,7 @@ const Login = () => {
     e.preventDefault();
     dispatch(loginUser(credentials));
   };
-
+ 
   return (
     <LoginContainer>
       <LoginForm onSubmit={handleSubmit}>

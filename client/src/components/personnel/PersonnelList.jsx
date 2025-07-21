@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { FiUser, FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
 import Table from '../ui/Table';
 import Loading from '../common/Loading';
 import Badge from '../ui/Badge';
 import { fadeIn } from '../../styles/animations';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchPersonnel, createPersonnel, updatePersonnel } from '../../redux/slices/personnelSlice';
+import { fetchBranches } from '../../redux/slices/branchSlice';
+import PersonnelForm from './PersonnelForm';
+import Modal from '../ui/Modal';
+import Button from '../ui/Button';
 
 const PersonnelListContainer = styled.div`
   animation: ${fadeIn} 0.5s ease forwards;
@@ -17,7 +23,43 @@ const RankBadge = styled(Badge)`
   font-size: 0.75rem;
 `;
 
-const PersonnelList = ({ personnel, loading, onPersonClick, onUpdate }) => {
+const PersonnelList = () => {
+  const dispatch = useDispatch();
+  const { personnel, loading } = useSelector((state) => state.personnel);
+  const { branches } = useSelector((state) => state.branches); // ✅ corrected state key
+
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [editingPerson, setEditingPerson] = useState(null);
+
+  useEffect(() => {
+    dispatch(fetchPersonnel());
+    dispatch(fetchBranches());
+  }, [dispatch]);
+
+  const handleAdd = () => {
+    setEditingPerson(null);
+    setModalOpen(true);
+  };
+
+  const handleEdit = (person) => {
+    setEditingPerson(person);
+    setModalOpen(true);
+  };
+
+  const handleClose = () => {
+    setModalOpen(false);
+    setEditingPerson(null);
+  };
+
+  const handleSubmit = (data) => {
+    if (editingPerson) {
+      dispatch(updatePersonnel({ id: editingPerson._id, updatedData: data }));
+    } else {
+      dispatch(createPersonnel(data));
+    }
+    handleClose();
+  };
+
   const columns = [
     {
       header: 'Name',
@@ -76,7 +118,8 @@ const PersonnelList = ({ personnel, loading, onPersonClick, onUpdate }) => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
           <FiMapPin size={14} />
           <span>
-            {row.currentPosting?.location || 'N/A'} ({new Date(row.currentPosting?.date).toLocaleDateString()})
+            {row.currentPosting?.location || 'N/A'}{' '}
+            {row.currentPosting?.date ? `(${new Date(row.currentPosting.date).toLocaleDateString()})` : ''}
           </span>
         </div>
       ),
@@ -89,14 +132,14 @@ const PersonnelList = ({ personnel, loading, onPersonClick, onUpdate }) => {
           <Button
             size="small"
             variant="outlined"
-            onClick={() => onPersonClick(row)}
+            onClick={() => console.log('Transfer logic')}
           >
             Transfer
           </Button>
           <Button
             size="small"
             variant="outlined"
-            onClick={() => onUpdate(row._id, { ...row, rank: 'Updated Rank' })}
+            onClick={() => handleEdit(row)}
           >
             Edit
           </Button>
@@ -105,17 +148,35 @@ const PersonnelList = ({ personnel, loading, onPersonClick, onUpdate }) => {
     },
   ];
 
-  if (loading) {
-    return <Loading />;
-  }
-
   return (
     <PersonnelListContainer>
-      <Table
-        columns={columns}
-        data={personnel}
-        emptyMessage="No personnel records found"
-      />
+      <Button onClick={handleAdd} style={{ marginBottom: '1rem' }}>
+        Add Personnel
+      </Button>
+
+      {loading ? (
+        <Loading />
+      ) : (
+        <Table
+          columns={columns}
+          data={personnel}
+          emptyMessage="No personnel records found"
+        />
+      )}
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleClose}
+        title={editingPerson ? 'Edit Personnel' : 'Add Personnel'}
+        size="medium"
+      >
+        <PersonnelForm
+          user={editingPerson}
+          branches={branches}
+          onSubmit={handleSubmit}
+          onCancel={handleClose}
+        />
+      </Modal>
     </PersonnelListContainer>
   );
 };

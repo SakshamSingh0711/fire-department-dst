@@ -1,11 +1,13 @@
+// BranchList.jsx
 import React from 'react';
 import styled from 'styled-components';
-import { FiHome, FiUsers, FiFileText } from 'react-icons/fi';
+import { FiUsers, FiFileText } from 'react-icons/fi';
 import Table from '../ui/Table';
 import Loading from '../common/Loading';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
 import { fadeIn } from '../../styles/animations';
+import { useNavigate } from 'react-router-dom';
 
 const BranchListContainer = styled.div`
   animation: ${fadeIn} 0.5s ease forwards;
@@ -25,7 +27,13 @@ const BranchStats = styled.div`
   }
 `;
 
-const BranchList = ({ branches, loading, onEdit, onDelete }) => {
+const BranchList = ({ branches, loading, onDelete }) => {
+  const navigate = useNavigate();
+
+  const handleEdit = (branch) => {
+    navigate(`/admin/branches/edit/${branch._id}`, { state: branch });
+  };
+
   const columns = [
     {
       header: 'Branch Name',
@@ -75,7 +83,7 @@ const BranchList = ({ branches, loading, onEdit, onDelete }) => {
       accessor: 'actions',
       cell: (row) => (
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <Button size="small" onClick={() => onEdit(row)}>
+          <Button size="small" onClick={() => handleEdit(row)}>
             Edit
           </Button>
           <Button

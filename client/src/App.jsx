@@ -1,7 +1,8 @@
+// App.jsx
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
-import { Provider, useSelector } from 'react-redux';
+import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { darkTheme } from './styles/theme';
 import { GlobalStyles } from './styles/GlobalStyles';
@@ -22,6 +23,7 @@ import NotFound from './pages/NotFound';
 import useMediaQuery from './hooks/useMediaQuery';
 import styled from 'styled-components';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import EditBranch from './components/branches/EditBranch';
 
 const AppContainer = styled.div`
   display: flex;
@@ -38,7 +40,7 @@ const MainContent = styled.div`
 const ContentWrapper = styled.div`
   flex: 1;
   padding: 2rem;
-  margin-left: ${({ $sidebarOpen, $isMobile }) => 
+  margin-left: ${({ $sidebarOpen, $isMobile }) =>
     $isMobile ? '0' : $sidebarOpen ? '250px' : '0'};
   transition: margin-left 0.3s ease;
 
@@ -81,54 +83,13 @@ const App = () => {
                   <Routes>
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
-                    <Route 
-                      path="/"
-                      element={
-                        <ProtectedRoute>
-                          <Home />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/branches/*"
-                      element={
-                        <ProtectedRoute>
-                          <Branches />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/files/*"
-                      element={
-                        <ProtectedRoute>
-                          <Files />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/personnel/*"
-                      element={
-                        <ProtectedRoute>
-                          <Personnel />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/admin/*"
-                      element={
-                        <ProtectedRoute roles={["Master"]}>
-                          <Admin />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/profile"
-                      element={
-                        <ProtectedRoute>
-                          <Profile />
-                        </ProtectedRoute>
-                      }
-                    />
+                    <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                    <Route path="/branches/*" element={<ProtectedRoute><Branches /></ProtectedRoute>} />
+                    <Route path="/files/*" element={<ProtectedRoute><Files /></ProtectedRoute>} />
+                    <Route path="/personnel/*" element={<ProtectedRoute><Personnel /></ProtectedRoute>} />
+                    <Route path="/admin/*" element={<ProtectedRoute roles={["Master"]}><Admin /></ProtectedRoute>} />
+                    <Route path="/admin/branches/edit/:id" element={<ProtectedRoute roles={["Master"]}><EditBranch /></ProtectedRoute>} />
+                    <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </ContentWrapper>

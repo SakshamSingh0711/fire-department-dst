@@ -58,7 +58,6 @@ const Branches = () => {
   }, []);
 
   useEffect(() => {
-    // Check URL for tab
     const params = new URLSearchParams(location.search);
     const tab = params.get('tab');
     if (tab && ['list', 'workspaces'].includes(tab)) {
@@ -68,7 +67,7 @@ const Branches = () => {
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-    navigate(`/branches?tab=${tab}`);
+    navigate(`/admin/branches?tab=${tab}`);
   };
 
   const handleCreateBranch = async (branchData) => {
@@ -76,29 +75,29 @@ const Branches = () => {
       const response = await api.createBranch(branchData);
       setBranches([...branches, response.data]);
       setShowCreateModal(false);
+      setSelectedBranch(null);
+      navigate('/admin/branches?tab=list');
     } catch (error) {
-      console.error('Error creating branch:', error);
+      console.error('Error creating branch:', error?.response?.data || error.message);
     }
   };
 
   const handleUpdateBranch = async (id, branchData) => {
     try {
       const response = await api.updateBranch(id, branchData);
-      setBranches(
-        branches.map((branch) =>
-          branch._id === id ? response.data : branch
-        )
-      );
+      setBranches(branches.map(branch => branch._id === id ? response.data : branch));
+      setShowCreateModal(false);
       setSelectedBranch(null);
+      navigate('/admin/branches?tab=list');
     } catch (error) {
-      console.error('Error updating branch:', error);
+      console.error('Error updating branch:', error?.response?.data || error.message);
     }
   };
 
   const handleDeleteBranch = async (id) => {
     try {
       await api.deleteBranch(id);
-      setBranches(branches.filter((branch) => branch._id !== id));
+      setBranches(branches.filter(branch => branch._id !== id));
     } catch (error) {
       console.error('Error deleting branch:', error);
     }
@@ -109,12 +108,21 @@ const Branches = () => {
     setShowCreateModal(true);
   };
 
+  const handleModalCancel = () => {
+    setShowCreateModal(false);
+    setSelectedBranch(null);
+    navigate('/admin/branches?tab=list');
+  };
+
   return (
     <BranchesContainer>
       <BranchesHeader>
         <h1>Branch Management</h1>
         {user?.role === 'Master' && (
-          <Button onClick={() => setShowCreateModal(true)}>
+          <Button onClick={() => {
+            setSelectedBranch(null);
+            setShowCreateModal(true);
+          }}>
             Add New Branch
           </Button>
         )}
@@ -139,31 +147,22 @@ const Branches = () => {
           />
         )}
 
-        {activeTab === 'workspaces' && (
-          <div>
-            <h2>Branch Workspaces</h2>
-            {/* Branch workspaces content would go here */}
-          </div>
-        )}
+        {activeTab === 'workspaces' && <div><h2>Branch Workspaces</h2></div>}
       </BranchesContent>
 
       <Modal
         isOpen={showCreateModal}
-        onClose={() => {
-          setShowCreateModal(false);
-          setSelectedBranch(null);
-        }}
+        onClose={handleModalCancel}
         title={selectedBranch ? 'Edit Branch' : 'Create New Branch'}
       >
         <BranchForm
           branch={selectedBranch}
-          onSubmit={selectedBranch ? 
-            (data) => handleUpdateBranch(selectedBranch._id, data) : 
-            handleCreateBranch
-          }
-          onCancel={() => {
-            setShowCreateModal(false);
-            setSelectedBranch(null);
+          onSubmit={(data) => {
+            if (selectedBranch) {
+              handleUpdateBranch(selectedBranch._id, data);
+            } else {
+              handleCreateBranch(data);
+            }
           }}
         />
       </Modal>

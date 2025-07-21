@@ -10,7 +10,7 @@ export const loginUser = createAsyncThunk(
       const response = await api.login(credentials);
       const { token } = response.data;
       if (!token) throw new Error('No token returned from server');
-      return { token };
+      return token;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: 'Login failed' });
     }
@@ -24,7 +24,7 @@ export const registerUser = createAsyncThunk(
       const response = await api.register(userData);
       const { token } = response.data;
       if (!token) throw new Error('Token not found in response');
-      return { token };
+      return token;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: 'Registration failed' });
     }
@@ -57,12 +57,14 @@ export const updateProfile = createAsyncThunk(
   }
 );
 
-// Load initial token and user from localStorage
+// Initial State
 let initialToken = localStorage.getItem('token') || null;
 let initialUser = null;
 
 try {
-  if (initialToken) initialUser = jwtDecode(initialToken);
+  if (initialToken) {
+    initialUser = jwtDecode(initialToken);
+  }
 } catch {
   initialToken = null;
   localStorage.removeItem('token');
@@ -101,12 +103,13 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // LOGIN
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        const { token } = action.payload;
+        const token = action.payload;
         const user = jwtDecode(token);
         state.token = token;
         state.user = user;
@@ -119,12 +122,13 @@ const authSlice = createSlice({
         state.isLoading = false;
       })
 
+      // REGISTER
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
-        const { token } = action.payload;
+        const token = action.payload;
         const user = jwtDecode(token);
         state.token = token;
         state.user = user;
@@ -137,6 +141,7 @@ const authSlice = createSlice({
         state.isLoading = false;
       })
 
+      // LOAD USER
       .addCase(loadUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -154,6 +159,7 @@ const authSlice = createSlice({
         localStorage.removeItem('user');
       })
 
+      // UPDATE PROFILE
       .addCase(updateProfile.pending, (state) => {
         state.isLoading = true;
         state.error = null;

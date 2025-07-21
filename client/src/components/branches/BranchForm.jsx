@@ -39,9 +39,12 @@ const FormActions = styled.div`
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Branch name is required'),
   code: Yup.string().required('Branch code is required'),
-  phone: Yup.string().matches(/^[0-9]+$/, 'Must be a valid phone number'),
-  email: Yup.string().email('Must be a valid email'),
-  isActive: Yup.boolean().required('Status is required'),
+  phone: Yup.string()
+    .matches(/^[0-9]+$/, 'Must be a valid phone number')
+    .nullable(),
+  email: Yup.string().email('Must be a valid email').nullable(),
+  head: Yup.string().nullable(),
+  isActive: Yup.boolean().nullable()
 });
 
 const BranchForm = ({ branch, onSubmit, onCancel }) => {
@@ -55,13 +58,20 @@ const BranchForm = ({ branch, onSubmit, onCancel }) => {
       phone: branch?.phone || '',
       email: branch?.email || '',
       head: branch?.head?._id || '',
-      isActive: branch ? branch.isActive : true,
+      isActive: branch?.isActive !== false, // default true
     },
     validationSchema,
+    enableReinitialize: true,
     onSubmit: async (values) => {
       setIsSubmitting(true);
       try {
-        await onSubmit(values);
+        const formattedValues = {
+          ...values,
+          isActive: Boolean(values.isActive),
+        };
+        await onSubmit(formattedValues);
+      } catch (err) {
+        console.error('Branch form submission error:', err);
       } finally {
         setIsSubmitting(false);
       }
@@ -98,7 +108,7 @@ const BranchForm = ({ branch, onSubmit, onCancel }) => {
         </FormGroup>
 
         <FormGroup>
-          <label htmlFor="phone">Contact Phone</label>
+          <label htmlFor="phone">Phone</label>
           <Input
             id="phone"
             name="phone"
@@ -111,7 +121,7 @@ const BranchForm = ({ branch, onSubmit, onCancel }) => {
         </FormGroup>
 
         <FormGroup>
-          <label htmlFor="email">Contact Email</label>
+          <label htmlFor="email">Email</label>
           <Input
             id="email"
             name="email"
@@ -146,12 +156,14 @@ const BranchForm = ({ branch, onSubmit, onCancel }) => {
           <Select
             id="isActive"
             name="isActive"
-            onChange={formik.handleChange}
+            onChange={(e) =>
+              formik.setFieldValue('isActive', e.target.value === 'true')
+            }
             onBlur={formik.handleBlur}
-            value={formik.values.isActive}
+            value={formik.values.isActive.toString()}
           >
-            <option value={true}>Active</option>
-            <option value={false}>Inactive</option>
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
           </Select>
         </FormGroup>
       </FormContainer>

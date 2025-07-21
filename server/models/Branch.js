@@ -15,20 +15,24 @@ const branchSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    trim: true
+    trim: true,
+    default: ''
   },
   head: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    default: null
   },
   phone: {
     type: String,
-    trim: true
+    trim: true,
+    default: ''
   },
   email: {
     type: String,
     trim: true,
-    lowercase: true
+    lowercase: true,
+    default: ''
   },
   isActive: {
     type: Boolean,

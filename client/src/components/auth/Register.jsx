@@ -1,17 +1,19 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../contexts/AuthContext';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
+import { registerUser } from '../../redux/slices/authSlice';
 import { shake } from '../../styles/animations';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
+import { Form } from 'formik';
 
 const RegisterContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(30, 30, 30, 0.9)),
+ 
     url('/assets/images/fire-station.jpg') no-repeat center center/cover;
 `;
 
@@ -46,9 +48,9 @@ const Register = () => {
     password: '',
     role: 'Branch'
   });
-  const [error, setError] = useState('');
-  const { registerUser } = useContext(AuthContext);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { loading, error } = useSelector((state) => state.auth);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -56,20 +58,19 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    const result = await registerUser(formData);
-    
-    if (!result.success) {
-      setError(result.message);
-    } else {
+    const resultAction = await dispatch(register(formData));
+    if (register.fulfilled.match(resultAction)) {
       navigate('/');
     }
+    // error will be automatically set in redux slice
   };
 
   return (
     <RegisterContainer>
       <RegisterForm onSubmit={handleSubmit}>
         <h2>Create Account</h2>
+        
+        <label htmlFor="idNumber">ID Number</label>
         <Input
           label="ID Number"
           name="idNumber"
@@ -77,6 +78,8 @@ const Register = () => {
           onChange={handleChange}
           required
         />
+        <br />
+        <label htmlFor="fullName">Full Name</label>
         <Input
           label="Full Name"
           name="name"
@@ -84,6 +87,8 @@ const Register = () => {
           onChange={handleChange}
           required
         />
+        <br />
+        <label htmlFor="email">Email</label>
         <Input
           label="Email"
           name="email"
@@ -92,6 +97,8 @@ const Register = () => {
           onChange={handleChange}
           required
         />
+        <br />  
+        <label htmlFor="password">Password</label>
         <Input
           label="Password"
           name="password"
@@ -119,8 +126,8 @@ const Register = () => {
           <option value="Office">Office User</option>
         </select>
         {error && <ErrorMessage>{error}</ErrorMessage>}
-        <Button type="submit" fullWidth>
-          Register
+        <Button type="submit" fullWidth disabled={loading}>
+          {loading ? 'Registering...' : 'Register'}
         </Button>
       </RegisterForm>
     </RegisterContainer>

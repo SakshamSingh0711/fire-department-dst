@@ -57,10 +57,24 @@ const ButtonStyled = styled.button`
     `}
 `;
 
-// Now safely extract startIcon and endIcon before passing to styled-component
-const Button = ({ children, startIcon, endIcon, variant, fullWidth, ...props }) => {
+const Button = ({
+  children,
+  startIcon,
+  endIcon,
+  variant = 'contained',
+  fullWidth = false,
+  type = 'button',
+  size = 'medium',
+  ...props
+}) => {
   return (
-    <ButtonStyled $variant={variant} $fullWidth={fullWidth} {...props}>
+    <ButtonStyled
+      type={type}               // ✅ Ensures "submit" is passed to <button>
+      $variant={variant}
+      $fullWidth={fullWidth}
+      size={size}
+      {...props}
+    >
       {startIcon && <span style={{ marginRight: '0.5rem' }}>{startIcon}</span>}
       {children}
       {endIcon && <span style={{ marginLeft: '0.5rem' }}>{endIcon}</span>}

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../api/branchesAPI';
 
+// Fetch all branches
 export const fetchBranches = createAsyncThunk(
   'branches/fetchAll',
   async (_, { rejectWithValue }) => {
@@ -13,11 +14,25 @@ export const fetchBranches = createAsyncThunk(
   }
 );
 
+// Create a new branch
 export const createBranch = createAsyncThunk(
   'branches/create',
   async (branchData, { rejectWithValue }) => {
     try {
       const response = await api.createBranch(branchData);
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response.data);
+    }
+  }
+);
+
+// Update an existing branch
+export const updateBranch = createAsyncThunk(
+  'branches/update',
+  async ({ id, branchData }, { rejectWithValue }) => {
+    try {
+      const response = await api.updateBranch(id, branchData);
       return response.data;
     } catch (err) {
       return rejectWithValue(err.response.data);
@@ -35,6 +50,7 @@ const branchSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Fetch
       .addCase(fetchBranches.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -47,6 +63,8 @@ const branchSlice = createSlice({
         state.error = action.payload?.message || 'Failed to fetch branches';
         state.loading = false;
       })
+
+      // Create
       .addCase(createBranch.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -57,6 +75,24 @@ const branchSlice = createSlice({
       })
       .addCase(createBranch.rejected, (state, action) => {
         state.error = action.payload?.message || 'Failed to create branch';
+        state.loading = false;
+      })
+
+      // Update
+      .addCase(updateBranch.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateBranch.fulfilled, (state, action) => {
+        const updatedBranch = action.payload;
+        const index = state.branches.findIndex(branch => branch._id === updatedBranch._id);
+        if (index !== -1) {
+          state.branches[index] = updatedBranch;
+        }
+        state.loading = false;
+      })
+      .addCase(updateBranch.rejected, (state, action) => {
+        state.error = action.payload?.message || 'Failed to update branch';
         state.loading = false;
       });
   }
