@@ -38,16 +38,16 @@ const personnelSchema = new mongoose.Schema({
   },
   age: {
     type: Number,
-    required: true
+    required: false
   },
   maritalStatus: {
     type: String,
     enum: ['Single', 'Married', 'Divorced', 'Widowed'],
-    required: true
+    required: false
   },
   homeCity: {
     type: String,
-    required: true,
+    required: false,
     trim: true
   },
   phone: {

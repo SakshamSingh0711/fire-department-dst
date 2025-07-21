@@ -21,7 +21,7 @@ router.get('/:id', auth, personnelController.getPersonnelById);
 router.post(
   '/',
   auth,
-  authorize(['Master', 'Office']),
+  authorize('Master', 'Office'),
   validate(personnelValidation),
   personnelController.createPersonnel
 );

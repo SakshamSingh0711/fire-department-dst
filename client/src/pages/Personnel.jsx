@@ -11,6 +11,8 @@ import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
 import Tabs from '../components/ui/Tabs';
 import api from '../api/personnelAPI';
+import branchesAPI from '../api/branchesAPI';
+import EditPersonnel from '../components/personnel/EditPersonnel';
 
 const PersonnelContainer = styled.div`
   padding: 2rem;
@@ -35,6 +37,7 @@ const PersonnelContent = styled.div`
 
 const Personnel = () => {
   const [personnel, setPersonnel] = useState([]);
+  const [branches, setBranches] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
@@ -45,23 +48,25 @@ const Personnel = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const fetchPersonnel = async () => {
+    const fetchInitialData = async () => {
       try {
         setIsLoading(true);
-        const response = await api.getAllPersonnel();
-        setPersonnel(response.data);
+        const [personnelRes, branchRes] = await Promise.all([
+          api.getAllPersonnel(),
+          branchesAPI.getAllBranches()
+        ]);
+        setPersonnel(personnelRes.data);
+        setBranches(branchRes.data);
       } catch (error) {
-        console.error('Error fetching personnel:', error);
+        console.error('Error loading data:', error);
       } finally {
         setIsLoading(false);
       }
     };
-
-    fetchPersonnel();
+    fetchInitialData();
   }, []);
 
   useEffect(() => {
-    // Check URL for tab
     const params = new URLSearchParams(location.search);
     const tab = params.get('tab');
     if (tab && ['list', 'transfers', 'vacancies'].includes(tab)) {
@@ -100,8 +105,7 @@ const Personnel = () => {
   const handleCreateTransfer = async (transferData) => {
     try {
       await api.createTransfer(transferData);
-      // Refresh personnel data
-      const response = await api.getPersonnel();
+      const response = await api.getAllPersonnel();
       setPersonnel(response.data);
       setShowTransferModal(false);
     } catch (error) {
@@ -111,7 +115,6 @@ const Personnel = () => {
 
   const handlePersonClick = (person) => {
     setSelectedPerson(person);
-    setShowTransferModal(true);
   };
 
   return (
@@ -148,7 +151,6 @@ const Personnel = () => {
         {activeTab === 'transfers' && (
           <div>
             <h2>Transfer Requests</h2>
-            {/* Transfer request list would go here */}
           </div>
         )}
 
@@ -163,6 +165,7 @@ const Personnel = () => {
         <PersonnelForm
           onSubmit={handleCreatePerson}
           onCancel={() => setShowCreateModal(false)}
+          branches={branches}
         />
       </Modal>
 
@@ -179,8 +182,23 @@ const Personnel = () => {
           />
         )}
       </Modal>
+
+      {/* Edit Personnel Modal */}
+      <Modal
+        isOpen={!!selectedPerson}
+        onClose={() => setSelectedPerson(null)}
+        title={`Edit Personnel: ${selectedPerson?.name}`}
+      >
+        {selectedPerson && (
+          <EditPersonnel
+            id={selectedPerson._id}
+            isOpen={!!selectedPerson}
+            onClose={() => setSelectedPerson(null)}
+          />
+        )}
+      </Modal>
     </PersonnelContainer>
   );
 };
 
-export default Personnel;   
+export default Personnel;

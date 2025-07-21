@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +13,7 @@ const validationSchema = Yup.object({
   isActive: Yup.boolean().optional(),
 });
 
-const PersonnelForm = ({ user, branches, onSubmit, onCancel }) => {
+const PersonnelForm = ({ user, branches = [], onSubmit, onCancel }) => {
   const navigate = useNavigate();
 
   const initialValues = {
@@ -26,7 +26,7 @@ const PersonnelForm = ({ user, branches, onSubmit, onCancel }) => {
   };
 
   const handleCancel = () => {
-    onCancel();
+    onCancel?.();
     navigate('/personnel/list');
   };
 
@@ -70,11 +70,12 @@ const PersonnelForm = ({ user, branches, onSubmit, onCancel }) => {
             <label>Branch</label>
             <Field as="select" name="currentBranch">
               <option value="">Select Branch</option>
-              {branches.map((branch) => (
-                <option key={branch._id} value={branch._id}>
-                  {branch.name}
-                </option>
-              ))}
+              {Array.isArray(branches) &&
+                branches.map((branch) => (
+                  <option key={branch._id} value={branch._id}>
+                    {branch.name}
+                  </option>
+                ))}
             </Field>
             <ErrorMessage name="currentBranch" component="div" />
           </div>

@@ -20,7 +20,12 @@ const FormContainer = styled.div`
 
 const FormGroup = styled.div`
   margin-bottom: 1rem;
-  grid-column: ${({ fullWidth }) => (fullWidth ? '1 / -1' : 'auto')};
+
+  ${({ $fullwidth }) =>
+    $fullwidth &&
+    `
+    grid-column: 1 / -1;
+  `}
 
   label {
     display: block;
@@ -99,7 +104,7 @@ const FileCreateForm = ({ onSubmit, onCancel }) => {
           />
         </FormGroup>
 
-        <FormGroup fullWidth>
+        <FormGroup $fullwidth>
           <label htmlFor="details">Details</label>
           <TextArea
             id="details"

@@ -43,9 +43,9 @@ const branchValidation = [
 const personnelValidation = [
   check('name', 'Name is required').notEmpty(),
   check('rank', 'Rank is required').notEmpty(),
-  check('age', 'Age is required').isInt({ min: 18 }),
-  check('maritalStatus', 'Marital status is required').notEmpty(),
-  check('homeCity', 'Home city is required').notEmpty()
+  // check('age', 'Age is required').isInt({ min: 18 }),
+  // check('maritalStatus', 'Marital status is required').notEmpty(),
+  // check('homeCity', 'Home city is required').notEmpty()
 ];
 
 const transferValidation = [
