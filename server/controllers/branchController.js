@@ -40,6 +40,10 @@ const updateBranch = async (req, res) => {
     logger.info(`Updating branch with ID: ${req.params.id}`);
     logger.info('Payload:', req.body);
 
+    if (req.body.head === '') {
+      req.body.head = null;
+    }
+
     const updated = await branchService.updateBranch(req.params.id, req.body);
 
     if (!updated) {
