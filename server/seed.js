@@ -5,7 +5,7 @@ const Branch = require('./models/Branch');
 const logger = require('./utils/logger');
 
 const seedDatabase = async () => {
-  try {
+  try { 
     await mongoose.connect(config.mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true
