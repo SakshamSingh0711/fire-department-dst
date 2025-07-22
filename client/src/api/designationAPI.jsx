@@ -1,35 +1,49 @@
 // src/api/designationsAPI.jsx
 import axios from 'axios';
 
-// It's better to use a relative URL for production builds
-const API = axios.create({ baseURL: '/api' });
+const API_URL = 'http://localhost:5001/api/designations';
 
-// Add an interceptor to include the token on every request
-API.interceptors.request.use((req) => {
-  const userInfo = localStorage.getItem('userInfo');
-  if (userInfo) {
-    req.headers.Authorization = `Bearer ${JSON.parse(userInfo).token}`;
-  }
-  return req;
+// Helper to get token from localStorage
+const getToken = () => {
+  // Using the 'userInfo' item as seen in other files
+  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  return userInfo ? userInfo.token : '';
+};
+
+// Common headers for authenticated requests
+const getHeaders = () => ({
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${getToken()}`,
 });
 
-export const fetchDesignations = async () => {
-  const res = await API.get('/designations');
-  return res.data;
+// Fetch all designations
+const fetchDesignations = async () => {
+  const response = await axios.get(API_URL, { headers: getHeaders() });
+  return response.data;
 };
 
-export const createDesignation = async (data) => {
-  const res = await API.post('/designations', data);
-  return res.data;
+// Create a new designation
+const createDesignation = async (designationData) => {
+  const response = await axios.post(API_URL, designationData, { headers: getHeaders() });
+  return response.data;
 };
 
-export const updateDesignation = async (id, data) => {
-  const res = await API.put(`/designations/${id}`, data);
-  return res.data;
+// Update an existing designation
+const updateDesignation = async (id, designationData) => {
+  const response = await axios.put(`${API_URL}/${id}`, designationData, { headers: getHeaders() });
+  return response.data;
 };
 
-// Add the missing delete function
-export const deleteDesignation = async (id) => {
-  const res = await API.delete(`/designations/${id}`);
-  return res.data;
+// Delete a designation by ID
+const deleteDesignation = async (id) => {
+  const response = await axios.delete(`${API_URL}/${id}`, { headers: getHeaders() });
+  return response.data;
+};
+
+// Export all functions as a single object
+export {
+  fetchDesignations,
+  createDesignation,
+  updateDesignation,
+  deleteDesignation,
 };

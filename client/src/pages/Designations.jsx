@@ -69,14 +69,11 @@ const Designation = () => {
   };
 
   const handleDelete = async (id) => {
-    // Using a simple confirm dialog for now
-    if (window.confirm('Are you sure you want to delete this designation?')) {
-      try {
-        await deleteDesignation(id);
-        loadDesignations(); // Refresh the list
-      } catch (error) {
-        console.error('Error deleting designation:', error);
-      }
+    try {
+      await deleteDesignation(id);
+      loadDesignations(); // Refresh the list after deleting
+    } catch (error) {
+      console.error('Error deleting designation:', error);
     }
   };
 
