@@ -1,6 +1,17 @@
+// src/api/designationsAPI.jsx
 import axios from 'axios';
 
-const API = axios.create({ baseURL: 'http://localhost:5001/api' });
+// It's better to use a relative URL for production builds
+const API = axios.create({ baseURL: '/api' });
+
+// Add an interceptor to include the token on every request
+API.interceptors.request.use((req) => {
+  const userInfo = localStorage.getItem('userInfo');
+  if (userInfo) {
+    req.headers.Authorization = `Bearer ${JSON.parse(userInfo).token}`;
+  }
+  return req;
+});
 
 export const fetchDesignations = async () => {
   const res = await API.get('/designations');
@@ -17,7 +28,8 @@ export const updateDesignation = async (id, data) => {
   return res.data;
 };
 
-export const toggleDesignationStatus = async (id) => {
-  const res = await API.patch(`/designations/${id}/toggle`);
+// Add the missing delete function
+export const deleteDesignation = async (id) => {
+  const res = await API.delete(`/designations/${id}`);
   return res.data;
 };
