@@ -45,10 +45,10 @@ const Branches = () => {
     const fetchBranches = async () => {
       try {
         setIsLoading(true);
-        const response = await api.getAllBranches();
-        setBranches(response.data);
+        const data = await api.getAllBranches();
+        setBranches(data);
       } catch (error) {
-        console.error('Error fetching branches:', error);
+        console.error('Error fetching branches:', error?.response?.data || error.message);
       } finally {
         setIsLoading(false);
       }
@@ -72,8 +72,8 @@ const Branches = () => {
 
   const handleCreateBranch = async (branchData) => {
     try {
-      const response = await api.createBranch(branchData);
-      setBranches([...branches, response.data]);
+      const newBranch = await api.createBranch(branchData);
+      setBranches((prev) => [...prev, newBranch]);
       setShowCreateModal(false);
       setSelectedBranch(null);
       navigate('/admin/branches?tab=list');
@@ -84,8 +84,8 @@ const Branches = () => {
 
   const handleUpdateBranch = async (id, branchData) => {
     try {
-      const response = await api.updateBranch(id, branchData);
-      setBranches(branches.map(branch => branch._id === id ? response.data : branch));
+      const updated = await api.updateBranch(id, branchData);
+      setBranches((prev) => prev.map(branch => branch._id === id ? updated : branch));
       setShowCreateModal(false);
       setSelectedBranch(null);
       navigate('/admin/branches?tab=list');
@@ -97,9 +97,9 @@ const Branches = () => {
   const handleDeleteBranch = async (id) => {
     try {
       await api.deleteBranch(id);
-      setBranches(branches.filter(branch => branch._id !== id));
+      setBranches((prev) => prev.filter(branch => branch._id !== id));
     } catch (error) {
-      console.error('Error deleting branch:', error);
+      console.error('Error deleting branch:', error?.response?.data || error.message);
     }
   };
 

@@ -37,18 +37,15 @@ const personnelSchema = new mongoose.Schema({
     trim: true
   },
   age: {
-    type: Number,
-    required: false
+    type: Number // optional by default
   },
   maritalStatus: {
     type: String,
-    enum: ['Single', 'Married', 'Divorced', 'Widowed'],
-    required: false
+    enum: ['Single', 'Married', 'Divorced', 'Widowed'] // optional by default
   },
   homeCity: {
     type: String,
-    required: false,
-    trim: true
+    trim: true // optional by default
   },
   phone: {
     type: String,
@@ -73,7 +70,7 @@ const personnelSchema = new mongoose.Schema({
 });
 
 // Add virtual for current posting
-personnelSchema.virtual('currentPosting').get(function() {
+personnelSchema.virtual('currentPosting').get(function () {
   return this.postingHistory.find(posting => posting.isCurrent) || null;
 });
 

@@ -53,25 +53,8 @@ const BranchList = ({ branches, loading, onDelete }) => {
       ),
     },
     {
-      header: 'Head of Branch',
-      accessor: 'head',
-      cell: (row) => row.head?.name || 'Not assigned',
-    },
-    {
-      header: 'Contact',
-      accessor: 'contact',
-      cell: (row) => (
-        <div>
-          <div>{row.phone || 'N/A'}</div>
-          <div style={{ fontSize: '0.8rem', color: '#aaa' }}>
-            {row.email || 'N/A'}
-          </div>
-        </div>
-      ),
-    },
-    {
       header: 'Status',
-      accessor: 'status',
+      accessor: 'isActive',
       cell: (row) => (
         <Badge variant={row.isActive ? 'success' : 'error'}>
           {row.isActive ? 'Active' : 'Inactive'}

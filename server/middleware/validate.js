@@ -18,7 +18,6 @@ const loginValidation = [
   check('password', 'Password is required').notEmpty()
 ];
 
-
 const registerValidation = [
   check('idNumber', 'ID Number is required').notEmpty(),
   check('name', 'Name is required').notEmpty(),
@@ -36,16 +35,12 @@ const fileValidation = [
 ];
 
 const branchValidation = [
-  check('name', 'Branch name is required').notEmpty(),
-  check('code', 'Branch code is required').notEmpty()
+  check('name', 'Branch name is required').notEmpty()
 ];
 
 const personnelValidation = [
   check('name', 'Name is required').notEmpty(),
-  check('rank', 'Rank is required').notEmpty(),
-  // check('age', 'Age is required').isInt({ min: 18 }),
-  // check('maritalStatus', 'Marital status is required').notEmpty(),
-  // check('homeCity', 'Home city is required').notEmpty()
+  check('rank', 'Rank is required').notEmpty()
 ];
 
 const transferValidation = [

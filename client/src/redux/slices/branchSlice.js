@@ -9,33 +9,33 @@ export const fetchBranches = createAsyncThunk(
       const response = await api.getAllBranches();
       return response.data;
     } catch (err) {
-      return rejectWithValue(err.response.data);
+      return rejectWithValue(err.response?.data || { message: 'Failed to fetch branches' });
     }
   }
 );
 
-// Create a new branch
+// Create a new branch (only requires { name })
 export const createBranch = createAsyncThunk(
   'branches/create',
-  async (branchData, { rejectWithValue }) => {
+  async ({ name }, { rejectWithValue }) => {
     try {
-      const response = await api.createBranch(branchData);
+      const response = await api.createBranch({ name });
       return response.data;
     } catch (err) {
-      return rejectWithValue(err.response.data);
+      return rejectWithValue(err.response?.data || { message: 'Failed to create branch' });
     }
   }
 );
 
-// Update an existing branch
+// Update an existing branch (only requires { name })
 export const updateBranch = createAsyncThunk(
   'branches/update',
-  async ({ id, branchData }, { rejectWithValue }) => {
+  async ({ id, name }, { rejectWithValue }) => {
     try {
-      const response = await api.updateBranch(id, branchData);
+      const response = await api.updateBranch(id, { name });
       return response.data;
     } catch (err) {
-      return rejectWithValue(err.response.data);
+      return rejectWithValue(err.response?.data || { message: 'Failed to update branch' });
     }
   }
 );

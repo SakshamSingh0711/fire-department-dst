@@ -10,6 +10,7 @@ import {
 const slideDown = keyframes`
   from { max-height: 0; opacity: 0; }
   to { max-height: 500px; opacity: 1; }
+
 `;
 
 const slideUp = keyframes`

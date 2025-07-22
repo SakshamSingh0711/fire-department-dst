@@ -5,7 +5,7 @@ const Branch = require('./models/Branch');
 const logger = require('./utils/logger');
 
 const seedDatabase = async () => {
-  try { 
+  try {
     await mongoose.connect(config.mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true
@@ -17,19 +17,17 @@ const seedDatabase = async () => {
     await User.deleteMany({});
     await Branch.deleteMany({});
     logger.info('🗑️ Cleared existing User and Branch data');
+    await Branch.collection.dropIndex('code_1');
 
     // Create default branches
     let branches = [];
     try {
       branches = await Branch.insertMany(
-        config.defaultBranches.map((name, index) => ({
+        config.defaultBranches.map(name => ({
           name,
-          code: `BR-${index + 1}`,
-          phone: `+123456789${index}`,
-          email: `${name.toLowerCase().replace(/\s+/g, '-') || 'branch'}@firedept.gov`,
           isActive: true
         })),
-        { ordered: true } // stop if there's a duplicate (safer for seeding)
+        { ordered: true }
       );
       logger.info(`✅ Inserted ${branches.length} branches`);
     } catch (branchErr) {
