@@ -212,6 +212,7 @@ const Sidebar = ({ isOpen }) => {
           <SubMenu $isOpen={openMenus.branches}>
             <SubMenuLink to="/branches/list" $active={isActive('/branches/list')}>All Branches</SubMenuLink>
             <SubMenuLink to="/branches/workspaces" $active={isActive('/branches/workspaces')}>Branch Workspaces</SubMenuLink>
+            <SubMenuLink to="/branches/Designations" $active={isActive('/branches/Designations')}>Designations</SubMenuLink>
           </SubMenu>
         </MenuItem>
       )}

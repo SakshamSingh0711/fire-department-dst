@@ -6,6 +6,7 @@ import branchReducer from './slices/branchSlice';
 import fileReducer from './slices/fileSlice';
 import personnelReducer from './slices/personnelSlice';
 import alertReducer from './slices/alertSlice';
+import designationReducer from './slices/designationSlice'; // ✅ Add this line
 
 const persistConfig = {
   key: 'root',
@@ -18,7 +19,8 @@ const rootReducer = {
   branches: branchReducer,
   files: fileReducer,
   personnel: personnelReducer,
-  alert: alertReducer
+  alert: alertReducer,
+  designation: designationReducer // ✅ Add this reducer
 };
 
 const store = configureStore({
