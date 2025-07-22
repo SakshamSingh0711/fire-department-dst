@@ -8,17 +8,12 @@ import Input from "../ui/Input";
 import Loading from "../common/Loading";
 import { pulse, shake } from "../../styles/animations";
 
-
 const LoginContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  ${'' /* background: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.8),
-      rgba(30, 30, 30, 0.9)
-    ), */}
-    url("/assets/images/fire-department-bg.jpg") no-repeat center center/cover;
+  height: 100vh;
+  background: url("/assets/images/fire-department-bg.jpg") no-repeat center center/cover;
 `;
 
 const LoginForm = styled.form`
@@ -99,7 +94,7 @@ const Login = () => {
     e.preventDefault();
     dispatch(loginUser(credentials));
   };
- 
+
   return (
     <LoginContainer>
       <LoginForm onSubmit={handleSubmit}>
@@ -114,6 +109,7 @@ const Login = () => {
             onChange={handleChange}
             required
             placeholder="Enter your ID"
+            style={{ color: "white" }}
           />
         </FormGroup>
         <FormGroup>
@@ -126,6 +122,7 @@ const Login = () => {
             onChange={handleChange}
             required
             placeholder="Enter your password"
+            style={{ color: "white" }}
           />
         </FormGroup>
         {error && <ErrorMessage>{error}</ErrorMessage>}

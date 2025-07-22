@@ -18,7 +18,6 @@ const EditBranch = () => {
       const fetchBranch = async () => {
         try {
           const data = await api.getBranchById(id);
-          console.log('Fetched branch from API:', data);
           setBranch(data);
         } catch (error) {
           console.error('Error loading branch:', error);
@@ -27,28 +26,25 @@ const EditBranch = () => {
         }
       };
       fetchBranch();
-    } else {
-      console.log('Using location.state for branch:', location.state);
     }
   }, [id, location.state]);
 
   const handleUpdate = async (values) => {
-  if (!values.name || values.name.trim() === '') {
-    console.error('Branch name is required');
-    return;
-  }
+    if (!values.name || values.name.trim() === '') {
+      console.error('Branch name is required');
+      return;
+    }
 
-  try {
-    const { name } = values;
-    const res = await dispatch(updateBranch({ id, branchData: { name } })).unwrap();
-    dispatch(fetchBranches());
-    navigate('/branches/list');
-  } catch (error) {
-    console.error('Failed to update branch:', error);
-  }
-};
+    try {
+      const res = await dispatch(updateBranch({ id, ...values })).unwrap();
+      dispatch(fetchBranches());
+      navigate('/branches/list');
+    } catch (error) {
+      console.error('Failed to update branch:', error);
+    }
+  };
+
   const handleCancel = () => {
-    console.log('Update cancelled');
     navigate('/branches/list');
   };
 

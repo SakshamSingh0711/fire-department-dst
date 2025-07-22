@@ -7,7 +7,7 @@ const logger = require('../utils/logger');
 const login = async (req, res) => {
   try {
     const { idNumber, password } = req.body;
-    console.log(`🔍 Login attempt for ID: ${idNumber}`);
+    logger.info(`🔍 Login attempt for ID: ${idNumber}`);
 
     const { user, token } = await authService.loginUser(idNumber, password);
 

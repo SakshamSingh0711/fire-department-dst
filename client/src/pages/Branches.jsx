@@ -128,14 +128,14 @@ const Branches = () => {
         )}
       </BranchesHeader>
 
-      <Tabs
+      {/* <Tabs
         tabs={[
           { id: 'list', label: 'All Branches' },
           { id: 'workspaces', label: 'Branch Workspaces' },
         ]}
         activeTab={activeTab}
         onChange={handleTabChange}
-      />
+      /> */}
 
       <BranchesContent>
         {activeTab === 'list' && (

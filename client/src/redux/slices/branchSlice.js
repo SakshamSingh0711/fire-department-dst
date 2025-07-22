@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../api/branchesAPI';
 
-// Fetch all branches
 export const fetchBranches = createAsyncThunk(
   'branches/fetchAll',
   async (_, { rejectWithValue }) => {
@@ -14,7 +13,6 @@ export const fetchBranches = createAsyncThunk(
   }
 );
 
-// Create a new branch (only requires { name })
 export const createBranch = createAsyncThunk(
   'branches/create',
   async ({ name }, { rejectWithValue }) => {
@@ -27,12 +25,11 @@ export const createBranch = createAsyncThunk(
   }
 );
 
-// Update an existing branch (only requires { name })
 export const updateBranch = createAsyncThunk(
   'branches/update',
-  async ({ id, name }, { rejectWithValue }) => {
+  async ({ id, ...fields }, { rejectWithValue }) => {
     try {
-      const response = await api.updateBranch(id, { name });
+      const response = await api.updateBranch(id, fields);
       return response.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: 'Failed to update branch' });
@@ -50,7 +47,6 @@ const branchSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch
       .addCase(fetchBranches.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -64,7 +60,6 @@ const branchSlice = createSlice({
         state.loading = false;
       })
 
-      // Create
       .addCase(createBranch.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -78,16 +73,19 @@ const branchSlice = createSlice({
         state.loading = false;
       })
 
-      // Update
       .addCase(updateBranch.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(updateBranch.fulfilled, (state, action) => {
         const updatedBranch = action.payload;
-        const index = state.branches.findIndex(branch => branch._id === updatedBranch._id);
-        if (index !== -1) {
-          state.branches[index] = updatedBranch;
+        if (Array.isArray(state.branches)) {
+          const index = state.branches.findIndex(branch => branch._id === updatedBranch._id);
+          if (index !== -1) {
+            state.branches[index] = updatedBranch;
+          }
+        } else {
+          state.branches = [updatedBranch];
         }
         state.loading = false;
       })

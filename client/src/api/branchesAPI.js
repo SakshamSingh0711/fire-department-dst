@@ -30,7 +30,7 @@ const createBranch = async (branchData) => {
 
 // Update existing branch with only 'name'
 const updateBranch = async (id, branchData) => {
-  console.log('Sending update payload:', branchData); // 👈 Added
+  console.log('Sending update payload:', id, branchData); // 👈 Added
   const response = await axios.put(`${API_URL}/${id}`, { name: branchData.name }, { headers: getHeaders() });
   return response.data;
 };
