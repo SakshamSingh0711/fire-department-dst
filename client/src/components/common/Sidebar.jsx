@@ -204,14 +204,14 @@ const Sidebar = ({ isOpen }) => {
         <MenuItem>
           <MenuLink as="div" onClick={() => toggleMenu('branches')} $active={location.pathname.startsWith('/branches')}>
             <MenuIcon><FiUsers /></MenuIcon>
-            <MenuText>Branches</MenuText>
+            <MenuText>Resource Activity</MenuText>
             <ExpandIcon $isOpen={openMenus.branches}>
               {openMenus.branches ? <FiChevronDown /> : <FiChevronRight />}
             </ExpandIcon>
           </MenuLink>
           <SubMenu $isOpen={openMenus.branches}>
-            <SubMenuLink to="/branches/list" $active={isActive('/branches/list')}>All Branches</SubMenuLink>
-            <SubMenuLink to="/branches/workspaces" $active={isActive('/branches/workspaces')}>Branch Workspaces</SubMenuLink>
+            <SubMenuLink to="/branches/list" $active={isActive('/branches/list')}>Branches</SubMenuLink>
+            <SubMenuLink to="/branches/location" $active={isActive('/branches/location')}>Office Location</SubMenuLink>
             <SubMenuLink to="/branches/Designations" $active={isActive('/branches/Designations')}>Designations</SubMenuLink>
           </SubMenu>
         </MenuItem>

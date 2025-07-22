@@ -25,6 +25,7 @@ import styled from 'styled-components';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import EditBranch from './components/branches/EditBranch';
 import Designations from './pages/Designations';
+import Location from './pages/Location';
 
 const AppContainer = styled.div`
   display: flex;
@@ -91,6 +92,7 @@ const App = () => {
                     <Route path="/admin/*" element={<ProtectedRoute roles={["Master"]}><Admin /></ProtectedRoute>} />
                     <Route path="/admin/branches/edit/:id" element={<ProtectedRoute roles={["Master"]}><EditBranch /></ProtectedRoute>} />
                     <Route path="/branches/Designations" element={<ProtectedRoute><Designations /></ProtectedRoute>} />
+                    <Route path="/branches/location" element={<ProtectedRoute allowedRoles={['admin']}><Location /></ProtectedRoute>} />
                     <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>

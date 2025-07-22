@@ -13,6 +13,7 @@ const fileRoutes = require('./routes/fileRoutes');
 const personnelRoutes = require('./routes/personnelRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const designationRoutes = require('./routes/designationRoutes');
+const officeLocationRoutes = require('./routes/officeLocationRoutes'); // ✅ new
 
 // Initialize Express app
 const app = express();
@@ -41,6 +42,7 @@ app.use('/api/files', fileRoutes);
 app.use('/api/personnel', personnelRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/designations', designationRoutes);
+app.use('/api/branches/location', officeLocationRoutes); // ✅ mounted here
 
 // Error handling middleware
 app.use(notFound);

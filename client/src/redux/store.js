@@ -1,12 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+
 import authReducer from './slices/authSlice';
 import branchReducer from './slices/branchSlice';
 import fileReducer from './slices/fileSlice';
 import personnelReducer from './slices/personnelSlice';
 import alertReducer from './slices/alertSlice';
-import designationReducer from './slices/designationSlice'; // ✅ Add this line
+import designationReducer from './slices/designationSlice';
+import locationReducer from './slices/locationSlice'; // ✅ Add this line
 
 const persistConfig = {
   key: 'root',
@@ -20,7 +22,8 @@ const rootReducer = {
   files: fileReducer,
   personnel: personnelReducer,
   alert: alertReducer,
-  designation: designationReducer // ✅ Add this reducer
+  designation: designationReducer,
+  locations: locationReducer // ✅ Add this reducer
 };
 
 const store = configureStore({
