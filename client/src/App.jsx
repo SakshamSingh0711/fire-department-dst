@@ -18,11 +18,11 @@ import Personnel from './pages/Personnel';
 import Admin from './pages/Admin';
 import Profile from './pages/Profile';
 import Login from './components/auth/Login';
-import Register from './components/auth/Register';
 import NotFound from './pages/NotFound';
 import useMediaQuery from './hooks/useMediaQuery';
 import styled from 'styled-components';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import UserManagement from './pages/UserManagement';
 import EditBranch from './components/branches/EditBranch';
 import Designations from './pages/Designations';
 import Location from './pages/Location';
@@ -84,12 +84,12 @@ const App = () => {
                   <Alert />
                   <Routes>
                     <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
                     <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
                     <Route path="/branches/*" element={<ProtectedRoute><Branches /></ProtectedRoute>} />
                     <Route path="/files/*" element={<ProtectedRoute><Files /></ProtectedRoute>} />
                     <Route path="/personnel/*" element={<ProtectedRoute><Personnel /></ProtectedRoute>} />
-                    <Route path="/admin/*" element={<ProtectedRoute roles={["Master"]}><Admin /></ProtectedRoute>} />
+                    <Route path="/admin/dashboard" element={<ProtectedRoute roles={["Master"]}><Admin /></ProtectedRoute>} />
+                    <Route path="/admin/users" element={<ProtectedRoute roles={["Master"]}><UserManagement /></ProtectedRoute>} />
                     <Route path="/admin/branches/edit/:id" element={<ProtectedRoute roles={["Master"]}><EditBranch /></ProtectedRoute>} />
                     <Route path="/branches/Designations" element={<ProtectedRoute><Designations /></ProtectedRoute>} />
                     <Route path="/branches/location" element={<ProtectedRoute allowedRoles={['admin']}><Location /></ProtectedRoute>} />

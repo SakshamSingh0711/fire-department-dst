@@ -2,7 +2,7 @@ import React from 'react';
 import { useFormik } from 'formik';
 import Button from '../ui/Button';
 
-const DesignationForm = ({ initialValues = { name: '' }, onSubmit, onClose }) => {
+const DesignationForm = ({ initialValues = { name: '' }, onSubmit, onCancel }) => {
   const formik = useFormik({
     initialValues,
     enableReinitialize: true,
@@ -22,7 +22,7 @@ const DesignationForm = ({ initialValues = { name: '' }, onSubmit, onClose }) =>
       />
     </div>
     <div className="flex justify-end space-x-2 space-y-4">
-      <Button type="button" onClick={onClose}>Cancel</Button>
+      <Button type="button" onClick={onCancel}>Cancel</Button>
       <Button type="submit">Submit</Button>
     </div>
   </form>
