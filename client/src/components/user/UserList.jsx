@@ -1,4 +1,3 @@
-
 import React from 'react';
 import styled from 'styled-components';
 import Table from '../ui/Table';
@@ -7,19 +6,32 @@ import Badge from '../ui/Badge';
 import Button from '../ui/Button';
 import { fadeIn } from '../../styles/animations';
 
-const DesignationListContainer = styled.div`
+const UserListContainer = styled.div`
   animation: ${fadeIn} 0.5s ease forwards;
 `;
 
-const DesignationList = ({ designations, loading, onEdit, onDelete }) => {
+const UserList = ({ users, loading, onEdit, onDelete }) => {
   const columns = [
     {
-      header: 'Designation Name',
+      header: 'Name',
       accessor: 'name',
     },
     {
+      header: 'Email',
+      accessor: 'email',
+    },
+    {
+      header: 'Role',
+      accessor: 'role',
+    },
+    {
+      header: 'Branch',
+      accessor: 'branch',
+      cell: (row) => row.branch?.name || 'N/A',
+    },
+    {
       header: 'Status',
-      accessor: 'status',
+      accessor: 'isActive',
       cell: (row) => (
         <Badge variant={row.isActive ? 'success' : 'error'}>
           {row.isActive ? 'Active' : 'Inactive'}
@@ -52,14 +64,14 @@ const DesignationList = ({ designations, loading, onEdit, onDelete }) => {
   }
 
   return (
-    <DesignationListContainer>
+    <UserListContainer>
       <Table
         columns={columns}
-        data={designations}
-        emptyMessage="No designations found"
+        data={users}
+        emptyMessage="No users found"
       />
-    </DesignationListContainer>
+    </UserListContainer>
   );
 };
 
-export default DesignationList;
+export default UserList;

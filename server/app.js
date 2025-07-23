@@ -14,6 +14,7 @@ const personnelRoutes = require('./routes/personnelRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const designationRoutes = require('./routes/designationRoutes');
 const officeLocationRoutes = require('./routes/officeLocationRoutes'); // ✅ new
+const userRoutes = require('./routes/userRoutes');
 
 // Initialize Express app
 const app = express();
@@ -43,6 +44,7 @@ app.use('/api/personnel', personnelRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/designations', designationRoutes);
 app.use('/api/branches/location', officeLocationRoutes); // ✅ mounted here
+app.use('/api/users', userRoutes);
 
 // Error handling middleware
 app.use(notFound);
